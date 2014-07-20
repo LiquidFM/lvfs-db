@@ -18,6 +18,8 @@
  */
 
 #include "lvfs_db_Storage.h"
+#include "nodes/root/lvfs_db_RootNode.h"
+#include "nodes/root/lvfs_db_RootView.h"
 
 
 namespace LVFS {
@@ -102,6 +104,11 @@ int Storage::permissions() const
 bool Storage::setPermissions(int value)
 {
     return m_file->as<IFsFile>()->setPermissions(value);
+}
+
+bool Storage::isDbValid() const
+{
+    return m_storage.isValid();
 }
 
 const LiquidDb::Storage::Entities &Storage::entities() const
@@ -207,6 +214,16 @@ bool Storage::removeValue(const Entity &entity, const Entity::IdsList &ids)
 bool Storage::removeValue(const EntityValue &entityValue, const EntityValue &propertyValue)
 {
     return m_storage.removeValue(entityValue, propertyValue);
+}
+
+Interface::Holder Storage::createNode(const Interface::Holder &file, const Interface::Holder &parent) const
+{
+    return Interface::Holder(new (std::nothrow) RootNode(file, parent));
+}
+
+Interface::Holder Storage::createView() const
+{
+    return Interface::Holder(new (std::nothrow) RootView());
 }
 
 const Error &Storage::lastError() const

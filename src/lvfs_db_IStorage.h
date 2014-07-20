@@ -61,6 +61,7 @@ public:
 public:
     virtual ~IStorage();
 
+    virtual bool isDbValid() const = 0;
     virtual const LiquidDb::Storage::Entities &entities() const = 0;
 
     virtual bool transaction() = 0;

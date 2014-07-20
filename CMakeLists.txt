@@ -7,7 +7,13 @@ project_cxx_library_header_default ()
 list (APPEND ${PROJECT_NAME}_LIBS brolly)
 list (APPEND ${PROJECT_NAME}_LIBS efc)
 list (APPEND ${PROJECT_NAME}_LIBS lvfs)
+list (APPEND ${PROJECT_NAME}_LIBS lvfs-core)
 list (APPEND ${PROJECT_NAME}_LIBS liquiddb)
+
+find_package (Qt4 4.7.1 COMPONENTS QtCore QtGui REQUIRED)
+include (${QT_USE_FILE})
+list (APPEND ${PROJECT_NAME}_LIBS ${QT_LIBRARIES})
+add_definitions (${QT_DEFINITIONS} -DQT_NO_CAST_FROM_ASCII)
 
 # Sources
 add_subdirectory (src)

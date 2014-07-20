@@ -17,48 +17,29 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_Plugin.h"
-#include "lvfs_db_Storage.h"
+#ifndef LVFS_DB_INODE_H_
+#define LVFS_DB_INODE_H_
 
-#include <lvfs/IDirectory>
-#include <brolly/assert.h>
+#include <QtCore/QAbstractItemModel>
+#include <lvfs/Interface>
 
 
 namespace LVFS {
 namespace Db {
 
-Plugin::Plugin()
-{}
-
-Plugin::~Plugin()
-{}
-
-Interface::Holder Plugin::open(const Interface::Holder &file) const
+class PLATFORM_MAKE_PRIVATE INode
 {
-    IDirectory *directory = file->as<IDirectory>();
-    ASSERT(directory != NULL);
-    Interface::Holder entry = directory->entry(".storage.idm");
+    DECLARE_INTERFACE(LVFS::Db::INode)
 
-    if (entry.isValid())
-    {
-        Interface::Holder res(new (std::nothrow) Storage(file, entry));
+public:
+    virtual ~INode();
 
-        if (LIKELY(res.isValid() == true))
-            if (res->as<IStorage>()->isDbValid())
-                return res;
-    }
+    virtual QAbstractItemModel *model() const = 0;
 
-    return Interface::Holder();
-}
-
-const Error &Plugin::lastError() const
-{
-    return m_error;
-}
-
-void Plugin::registered()
-{
-
-}
+    virtual QModelIndex parentIndex() const = 0;
+    virtual void setParentIndex(const QModelIndex &index) = 0;
+};
 
 }}
+
+#endif /* LVFS_DB_INODE_H_ */

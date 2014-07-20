@@ -17,48 +17,13 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_Plugin.h"
-#include "lvfs_db_Storage.h"
-
-#include <lvfs/IDirectory>
-#include <brolly/assert.h>
+#include "lvfs_db_INode.h"
 
 
 namespace LVFS {
 namespace Db {
 
-Plugin::Plugin()
+INode::~INode()
 {}
-
-Plugin::~Plugin()
-{}
-
-Interface::Holder Plugin::open(const Interface::Holder &file) const
-{
-    IDirectory *directory = file->as<IDirectory>();
-    ASSERT(directory != NULL);
-    Interface::Holder entry = directory->entry(".storage.idm");
-
-    if (entry.isValid())
-    {
-        Interface::Holder res(new (std::nothrow) Storage(file, entry));
-
-        if (LIKELY(res.isValid() == true))
-            if (res->as<IStorage>()->isDbValid())
-                return res;
-    }
-
-    return Interface::Holder();
-}
-
-const Error &Plugin::lastError() const
-{
-    return m_error;
-}
-
-void Plugin::registered()
-{
-
-}
 
 }}

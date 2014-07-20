@@ -17,48 +17,39 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_Plugin.h"
-#include "lvfs_db_Storage.h"
+#ifndef LVFS_DB_ROOTVIEW_H_
+#define LVFS_DB_ROOTVIEW_H_
 
-#include <lvfs/IDirectory>
-#include <brolly/assert.h>
+#include <QtGui/QTreeView>
+#include <lvfs-core/IView>
 
 
 namespace LVFS {
 namespace Db {
 
-Plugin::Plugin()
-{}
-
-Plugin::~Plugin()
-{}
-
-Interface::Holder Plugin::open(const Interface::Holder &file) const
+class PLATFORM_MAKE_PRIVATE RootView : public Implements<Core::IView>
 {
-    IDirectory *directory = file->as<IDirectory>();
-    ASSERT(directory != NULL);
-    Interface::Holder entry = directory->entry(".storage.idm");
+public:
+    RootView();
+    virtual ~RootView();
 
-    if (entry.isValid())
-    {
-        Interface::Holder res(new (std::nothrow) Storage(file, entry));
+    virtual QWidget *widget() const;
+    virtual void setMainView(const Interface::Holder &mainView);
 
-        if (LIKELY(res.isValid() == true))
-            if (res->as<IStorage>()->isDbValid())
-                return res;
-    }
+    virtual const Interface::Holder &node() const;
+    virtual bool setNode(const Interface::Holder &node);
 
-    return Interface::Holder();
-}
+private:
+    inline bool openNode(const Interface::Holder &node, const QModelIndex &currentIdx, const QModelIndex &parentIdx);
 
-const Error &Plugin::lastError() const
-{
-    return m_error;
-}
+private:
+    Interface::Holder m_node;
+    Interface::Holder m_mainView;
 
-void Plugin::registered()
-{
-
-}
+private:
+    QTreeView m_view;
+};
 
 }}
+
+#endif /* LVFS_DB_ROOTVIEW_H_ */

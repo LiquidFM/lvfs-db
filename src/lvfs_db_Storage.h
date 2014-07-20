@@ -24,6 +24,8 @@
 #include <lvfs/IFsFile>
 #include <lvfs/IDirectory>
 #include <lvfs-db/IStorage>
+#include <lvfs-core/INodeFactory>
+#include <lvfs-core/IViewFactory>
 
 
 namespace LVFS {
@@ -32,7 +34,7 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE Storage : public Implements<IEntry, IDirectory, IFsFile, IStorage>
+class PLATFORM_MAKE_PRIVATE Storage : public Implements<IEntry, IDirectory, IFsFile, IStorage, Core::INodeFactory, Core::IViewFactory>
 {
 public:
     Storage(const Interface::Holder &file, const Interface::Holder &storage);
@@ -65,6 +67,7 @@ public:
 
     /* IStorage */
 
+    virtual bool isDbValid() const;
     virtual const LiquidDb::Storage::Entities &entities() const;
 
     virtual bool transaction();
@@ -92,8 +95,13 @@ public:
     virtual bool removeValue(const Entity &entity, const Entity::IdsList &ids);
     virtual bool removeValue(const EntityValue &entityValue, const EntityValue &propertyValue);
 
-    /* COMMON */
+    /* Core::INodeFactory */
+    virtual Interface::Holder createNode(const Interface::Holder &file, const Interface::Holder &parent) const;
 
+    /* Core::IViewFactory */
+    virtual Interface::Holder createView() const;
+
+    /* COMMON */
     virtual const Error &lastError() const;
 
 private:
