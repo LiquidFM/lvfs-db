@@ -22,8 +22,9 @@
 #include "items/lvfs_db_RootNodePropertyItem.h"
 #include "items/lvfs_db_RootNodeEntityItem.h"
 #include "items/lvfs_db_RootNodeFilesItem.h"
-#include "items/lvfs_db_RootNodeRootItem.h"
 
+#include <lvfs/IEntry>
+#include <lvfs-core/models/Qt/IView>
 #include <brolly/assert.h>
 
 
@@ -33,42 +34,16 @@ namespace Db {
 RootNode::RootNode(const Interface::Holder &container, const Interface::Holder &parent) :
     Core::Qt::BaseNode(parent),
     m_container(container),
-    m_title(toUnicode(m_container.interface()->as<IEntry>()->title())),
-    m_schema(toUnicode(m_container.interface()->as<IEntry>()->schema())),
-    m_location(toUnicode(m_container.interface()->as<IEntry>()->location())),
-    m_icon(),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
 {
     ASSERT(m_container.isValid());
     ASSERT(m_sorting.first < columnCount(QModelIndex()));
-    m_icon.addFile(toUnicode(m_container.interface()->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
-
-    for (auto i : m_container->entities())
-        doAdd(i.second);
 }
 
 RootNode::~RootNode()
-{}
-
-const QString &RootNode::title() const
 {
-    return m_title;
-}
-
-const QString &RootNode::schema() const
-{
-    return m_schema;
-}
-
-const QString &RootNode::location() const
-{
-    return m_location;
-}
-
-const Interface::Holder &RootNode::file() const
-{
-    return m_container.interface();
+    ASSERT(m_items.empty());
 }
 
 const Interface::Holder &RootNode::parent() const
@@ -76,27 +51,40 @@ const Interface::Holder &RootNode::parent() const
     return Core::Node::parent();
 }
 
-const RootNode::Geometry &RootNode::geometry() const
+const Interface::Holder &RootNode::file() const
 {
-    return m_geometry;
-}
-
-const RootNode::Sorting &RootNode::sorting() const
-{
-    return m_sorting;
+    return m_container.interface();
 }
 
 void RootNode::refresh(int depth)
-{}
+{
+    if (m_items.empty())
+        for (auto i : m_container->entities())
+            doAdd(i.second);
+
+    if (!m_items.empty())
+        for (auto i : views())
+            i->as<Core::Qt::IView>()->select(currentIndex());
+}
+
+void RootNode::incLinks(int count)
+{
+    Core::Node::incLinks(count);
+}
+
+void RootNode::decLinks(int count)
+{
+    Core::Node::decLinks(count);
+}
 
 void RootNode::opened(const Interface::Holder &view)
 {
-    return Core::Node::opened();
+    Core::Node::opened(view);
 }
 
 void RootNode::closed(const Interface::Holder &view)
 {
-    return Core::Node::closed();
+    Core::Node::closed(view);
 }
 
 Qt::ItemFlags RootNode::flags(const QModelIndex &index) const
@@ -109,14 +97,24 @@ QAbstractItemModel *RootNode::model() const
     return const_cast<RootNode *>(this);
 }
 
-QModelIndex RootNode::parentIndex() const
+const RootNode::Geometry &RootNode::geometry() const
 {
-    return m_parentIndex;
+    return m_geometry;
 }
 
-void RootNode::setParentIndex(const QModelIndex &index)
+const RootNode::Sorting &RootNode::sorting() const
 {
-    m_parentIndex = index;
+    return m_sorting;
+}
+
+QModelIndex RootNode::currentIndex() const
+{
+    return m_currentIndex;
+}
+
+void RootNode::setCurrentIndex(const QModelIndex &index)
+{
+    m_currentIndex = index;
 }
 
 RootNode::size_type RootNode::size() const
@@ -143,7 +141,12 @@ void RootNode::removeChildren()
     if (!m_items.empty())
     {
         beginRemoveRows(QModelIndex(), 0, m_items.size() - 1);
+
+        for (auto &i : m_items)
+            delete i;
+
         m_items.clear();
+        m_entities.clear();
         endRemoveRows();
     }
 }

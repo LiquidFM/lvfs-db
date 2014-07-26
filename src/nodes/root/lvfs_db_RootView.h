@@ -23,31 +23,66 @@
 #include <QtGui/QTreeView>
 #include <lvfs-core/IView>
 
+#include <lvfs-core/models/Qt/IView>
+#include <lvfs-core/tools/events/ContextMenuEventHandler>
+#include <lvfs-core/tools/events/ContextMenuEventSource>
+#include <lvfs-core/tools/events/KeyboardEventHandler>
+#include <lvfs-core/tools/events/KeyboardEventSource>
+#include <lvfs-core/tools/events/MouseEventHandler>
+#include <lvfs-core/tools/events/MouseEventSource>
+
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE RootView : public Implements<Core::IView>
+class PLATFORM_MAKE_PRIVATE RootView : public Implements<Core::IView, Core::Qt::IView>
 {
 public:
     RootView();
     virtual ~RootView();
 
+    /* Core::IView */
     virtual QWidget *widget() const;
     virtual void setMainView(const Interface::Holder &mainView);
 
     virtual const Interface::Holder &node() const;
     virtual bool setNode(const Interface::Holder &node);
 
+    /* Core::Qt::IView */
+    virtual void select(const QModelIndex &index);
+
 private:
-    inline bool openNode(const Interface::Holder &node, const QModelIndex &currentIdx, const QModelIndex &parentIdx);
+    void goUpShortcut();
+    void goIntoShortcut();
+    void renameShortcut();
+    void createFileShortcut();
+    void removeShortcut();
+    void searchShortcut();
+
+private:
+    typedef Tools::MouseDoubleClickEventSource<
+                Tools::ContextMenuEventSource<
+                    Tools::KeyboardEventSource<
+                        Tools::EventSourceBase<
+                            QTreeView
+                        >
+                    >
+                >
+            > TreeView;
+
+    typedef Tools::MouseDoubleClickEventHandler<
+                Tools::KeyboardEventHandler<
+                    Tools::EventHandlerBase<RootView>
+                >
+            > EventHandler;
 
 private:
     Interface::Holder m_node;
     Interface::Holder m_mainView;
 
 private:
-    QTreeView m_view;
+    TreeView m_view;
+    EventHandler m_eventHandler;
 };
 
 }}

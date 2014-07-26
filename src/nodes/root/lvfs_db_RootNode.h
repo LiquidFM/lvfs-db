@@ -45,15 +45,12 @@ public:
     virtual ~RootNode();
 
     /* Core::INode */
-    virtual const QString &title() const;
-    virtual const QString &schema() const;
-    virtual const QString &location() const;
-    virtual const Interface::Holder &file() const;
     virtual const Interface::Holder &parent() const;
-    virtual const Geometry &geometry() const;
-    virtual const Sorting &sorting() const;
+    virtual const Interface::Holder &file() const;
 
     virtual void refresh(int depth = 0);
+    virtual void incLinks(int count);
+    virtual void decLinks(int count);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
 
@@ -63,8 +60,11 @@ public:
     /* Db::INode */
     virtual QAbstractItemModel *model() const;
 
-    virtual QModelIndex parentIndex() const;
-    virtual void setParentIndex(const QModelIndex &index);
+    virtual const Geometry &geometry() const;
+    virtual const Sorting &sorting() const;
+
+    virtual QModelIndex currentIndex() const;
+    virtual void setCurrentIndex(const QModelIndex &index);
 
 protected:
     /* Core::Tools::TreeModel */
@@ -90,13 +90,9 @@ private:
     EntitiesMap m_entities;
     EFC::Vector<Item *> m_items;
     Interface::Adaptor<IStorage> m_container;
-    QModelIndex m_parentIndex;
+    QModelIndex m_currentIndex;
 
 private:
-    QString m_title;
-    QString m_schema;
-    QString m_location;
-    QIcon m_icon;
     Geometry m_geometry;
     Sorting m_sorting;
 };

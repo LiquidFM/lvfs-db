@@ -20,8 +20,10 @@
 #ifndef LVFS_DB_INODE_H_
 #define LVFS_DB_INODE_H_
 
-#include <QtCore/QAbstractItemModel>
+#include <efc/List>
+#include <efc/Pair>
 #include <lvfs/Interface>
+#include <QtCore/QAbstractItemModel>
 
 
 namespace LVFS {
@@ -32,12 +34,19 @@ class PLATFORM_MAKE_PRIVATE INode
     DECLARE_INTERFACE(LVFS::Db::INode)
 
 public:
+    typedef EFC::List<qint32>                  Geometry;
+    typedef EFC::Pair<qint32, ::Qt::SortOrder> Sorting;
+
+public:
     virtual ~INode();
 
     virtual QAbstractItemModel *model() const = 0;
 
-    virtual QModelIndex parentIndex() const = 0;
-    virtual void setParentIndex(const QModelIndex &index) = 0;
+    virtual const Geometry &geometry() const = 0;
+    virtual const Sorting &sorting() const = 0;
+
+    virtual QModelIndex currentIndex() const = 0;
+    virtual void setCurrentIndex(const QModelIndex &index) = 0;
 };
 
 }}

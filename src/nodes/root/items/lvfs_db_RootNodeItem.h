@@ -32,7 +32,6 @@ class RootNodeItem : public Core::Tools::TreeModel::Item
 public:
     RootNodeItem(Base *parent);
 
-    virtual bool isRoot();
     virtual bool isFiles();
     virtual bool isEntity();
     virtual bool isProperty();

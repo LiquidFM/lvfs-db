@@ -32,21 +32,29 @@ namespace LVFS {
 namespace Db {
 
 RootView::RootView() :
-    m_view()
+    m_view(&m_eventHandler),
+    m_eventHandler(this)
 {
     m_view.setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_view.setContextMenuPolicy(::Qt::DefaultContextMenu);
     m_view.setSortingEnabled(true);
+
+    m_eventHandler.registerMouseDoubleClickEventHandler(&RootView::goIntoShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Return,    &RootView::goIntoShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Enter,     &RootView::goIntoShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Backspace, &RootView::goUpShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F2,        &RootView::renameShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F8,        &RootView::createFileShortcut);
+    m_eventHandler.registerShortcut(::Qt::SHIFT,      ::Qt::Key_Delete,    &RootView::removeShortcut);
+    m_eventHandler.registerShortcut(::Qt::CTRL,       ::Qt::Key_F,         &RootView::searchShortcut);
 }
 
 RootView::~RootView()
-{
-    ASSERT(!m_node.isValid());
-}
+{}
 
 QWidget *RootView::widget() const
 {
-    return const_cast<QTreeView *>(&m_view);
+    return const_cast<TreeView *>(&m_view);
 }
 
 void RootView::setMainView(const Interface::Holder &mainView)
@@ -69,52 +77,67 @@ bool RootView::setNode(const Interface::Holder &node)
         return true;
     }
 
-    return openNode(node, QModelIndex(), QModelIndex());
-}
-
-bool RootView::openNode(const Interface::Holder &node, const QModelIndex &currentIdx, const QModelIndex &parentIdx)
-{
     Core::INode *coreNode = node->as<Core::INode>();
 
     if (Db::INode *dbNode = node->as<Db::INode>())
     {
-        if (parentIdx.isValid())
-            dbNode->setParentIndex(parentIdx);
-        else if (currentIdx.isValid())
-            m_node->as<Core::INode>()->closed(Interface::Holder::fromRawData(this));
-
         m_node = node;
         m_view.setModel(dbNode->model());
-        coreNode->opened(Interface::Holder::fromRawData(this));
-
-        qint32 column = 0;
-        for (auto i : coreNode->geometry())
-            m_view.setColumnWidth(column++, i);
-
-        m_view.sortByColumn(coreNode->sorting().first, coreNode->sorting().second);
-
-        coreNode->refresh(0);
-
-        QModelIndex selected = currentIdx;
-
-        if (selected.isValid())
-            selected = dbNode->model()->index(selected.row(), selected.column());
-
-        if (!selected.isValid())
-            selected = dbNode->model()->index(0, 0);
-
-        if (LIKELY(selected.isValid() == true))
-        {
-            m_view.setFocus();
-            m_view.scrollTo(selected, QAbstractItemView::PositionAtCenter);
-            m_view.selectionModel()->select(selected, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Columns);
-            m_view.selectionModel()->setCurrentIndex(selected, QItemSelectionModel::ClearAndSelect);
-        }
+        m_view.sortByColumn(dbNode->sorting().first, dbNode->sorting().second);
 
         return true;
     }
 
     return false;
+}
+
+void RootView::select(const QModelIndex &index)
+{
+    QModelIndex toBeSelected = index;
+
+    if (!toBeSelected.isValid())
+        toBeSelected = m_view.model()->index(0, 0);
+
+    if (LIKELY(toBeSelected.isValid() == true))
+    {
+        m_view.setFocus();
+        m_view.scrollTo(toBeSelected, QAbstractItemView::PositionAtCenter);
+        m_view.selectionModel()->select(toBeSelected, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Columns);
+        m_view.selectionModel()->setCurrentIndex(toBeSelected, QItemSelectionModel::ClearAndSelect);
+    }
+}
+
+void RootView::goUpShortcut()
+{
+    const Interface::Holder &node = m_node->as<Core::INode>()->parent();
+
+    if (node.isValid())
+        m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), node);
+}
+
+void RootView::goIntoShortcut()
+{
+
+}
+
+void RootView::renameShortcut()
+{
+
+}
+
+void RootView::createFileShortcut()
+{
+
+}
+
+void RootView::removeShortcut()
+{
+
+}
+
+void RootView::searchShortcut()
+{
+
 }
 
 }}

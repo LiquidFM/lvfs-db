@@ -19,6 +19,7 @@
 
 #include "lvfs_db_RootNodeItem.h"
 
+#include "lvfs_db_RootNodeEntityItem.h"
 
 namespace LVFS {
 namespace Db {
@@ -26,11 +27,6 @@ namespace Db {
 RootNodeItem::RootNodeItem(Base *parent) :
     Core::Tools::TreeModel::Item(parent)
 {}
-
-bool RootNodeItem::isRoot()
-{
-    return false;
-}
 
 bool RootNodeItem::isFiles()
 {
@@ -53,8 +49,10 @@ RootNodeListItem::RootNodeListItem(Base *parent) :
 
 RootNodeListItem::~RootNodeListItem()
 {
-    for (auto i : m_items)
+    for (auto &i : m_items)
         delete i;
+
+    m_items.clear();
 }
 
 RootNodeListItem::Base *RootNodeListItem::at(size_type index) const
