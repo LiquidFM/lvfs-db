@@ -26,85 +26,13 @@ namespace LVFS {
 namespace Db {
 
 Storage::Storage(const Interface::Holder &file, const Interface::Holder &storage) :
-    m_file(file),
+    ExtendsBy(file),
     m_fileStorage(storage),
-    m_storage(m_fileStorage->as<IEntry>()->location(), false),
-    m_error(),
-    m_lastError(&m_error)
+    m_storage(m_fileStorage->as<IEntry>()->location(), false)
 {}
 
 Storage::~Storage()
 {}
-
-const char *Storage::title() const
-{
-    return m_file->as<IEntry>()->title();
-}
-
-const char *Storage::schema() const
-{
-    return m_file->as<IEntry>()->schema();
-}
-
-const char *Storage::location() const
-{
-    return m_file->as<IEntry>()->location();
-}
-
-const IType *Storage::type() const
-{
-    return m_file->as<IEntry>()->type();
-}
-
-Storage::const_iterator Storage::begin() const
-{
-    return m_file->as<IDirectory>()->begin();
-}
-
-Storage::const_iterator Storage::end() const
-{
-    return m_file->as<IDirectory>()->end();
-}
-
-Interface::Holder Storage::entry(const char *name) const
-{
-    return m_file->as<IDirectory>()->entry(name);
-}
-
-bool Storage::rename(const Interface::Holder &file, const char *name)
-{
-    return m_file->as<IDirectory>()->rename(file, name);
-}
-
-bool Storage::remove(const Interface::Holder &file)
-{
-    return m_file->as<IDirectory>()->remove(file);
-}
-
-time_t Storage::cTime() const
-{
-    return m_file->as<IFsFile>()->cTime();
-}
-
-time_t Storage::mTime() const
-{
-    return m_file->as<IFsFile>()->mTime();
-}
-
-time_t Storage::aTime() const
-{
-    return m_file->as<IFsFile>()->aTime();
-}
-
-int Storage::permissions() const
-{
-    return m_file->as<IFsFile>()->permissions();
-}
-
-bool Storage::setPermissions(int value)
-{
-    return m_file->as<IFsFile>()->setPermissions(value);
-}
 
 bool Storage::isDbValid() const
 {
@@ -224,11 +152,6 @@ Interface::Holder Storage::createNode(const Interface::Holder &file, const Inter
 Interface::Holder Storage::createView() const
 {
     return Interface::Holder(new (std::nothrow) RootView());
-}
-
-const Error &Storage::lastError() const
-{
-    return *m_lastError;
 }
 
 }}

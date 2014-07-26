@@ -34,39 +34,13 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE Storage : public Implements<IEntry, IDirectory, IFsFile, IStorage, Core::INodeFactory, Core::IViewFactory>
+class PLATFORM_MAKE_PRIVATE Storage : public ExtendsBy<IStorage, Core::INodeFactory, Core::IViewFactory>
 {
 public:
     Storage(const Interface::Holder &file, const Interface::Holder &storage);
     virtual ~Storage();
 
-    /* IEntry */
-
-    virtual const char *title() const;
-    virtual const char *schema() const;
-    virtual const char *location() const;
-    virtual const IType *type() const;
-
-    /* IDirectory */
-
-    virtual const_iterator begin() const;
-    virtual const_iterator end() const;
-    virtual Interface::Holder entry(const char *name) const;
-
-    virtual bool rename(const Interface::Holder &file, const char *name);
-    virtual bool remove(const Interface::Holder &file);
-
-    /* IFsFile */
-
-    virtual time_t cTime() const;
-    virtual time_t mTime() const;
-    virtual time_t aTime() const;
-
-    virtual int permissions() const;
-    virtual bool setPermissions(int value);
-
     /* IStorage */
-
     virtual bool isDbValid() const;
     virtual const LiquidDb::Storage::Entities &entities() const;
 
@@ -101,15 +75,9 @@ public:
     /* Core::IViewFactory */
     virtual Interface::Holder createView() const;
 
-    /* COMMON */
-    virtual const Error &lastError() const;
-
 private:
-    Interface::Holder m_file;
     Interface::Holder m_fileStorage;
     LiquidDb::Storage m_storage;
-    mutable Error m_error;
-    mutable const Error *m_lastError;
 };
 
 }}
