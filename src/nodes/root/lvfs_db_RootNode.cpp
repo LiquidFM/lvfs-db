@@ -22,10 +22,14 @@
 #include "items/lvfs_db_RootNodePropertyItem.h"
 #include "items/lvfs_db_RootNodeEntityItem.h"
 #include "items/lvfs_db_RootNodeFilesItem.h"
+#include "../../lvfs_db_common.h"
+#include "../../gui/value/list/editable/lvfs_db_EditableValueListDialog.h"
 
 #include <lvfs/IEntry>
 #include <lvfs-core/models/Qt/IView>
 #include <brolly/assert.h>
+
+#include <QtGui/QMessageBox>
 
 
 namespace LVFS {
@@ -115,6 +119,47 @@ QModelIndex RootNode::currentIndex() const
 void RootNode::setCurrentIndex(const QModelIndex &index)
 {
     m_currentIndex = index;
+}
+
+Interface::Holder RootNode::activated(const QModelIndex &index, QWidget *parent)
+{
+    RootNodeItem *item;
+
+    if ((item = static_cast<RootNodeItem *>(index.internalPointer()))->isEntity())
+        if (m_container->transaction())
+        {
+            EntityValueReader reader(m_container->entityValues(static_cast<RootNodeEntityItem *>(item)->entity()));
+            EditableValueListDialog dialog(m_container, reader, parent);
+
+            if (dialog.exec() == EditableValueListDialog::Accepted)
+            {
+                if (!m_container->commit())
+                {
+                    QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                    m_container->rollback();
+                }
+            }
+            else
+                m_container->rollback();
+
+            m_container->setListGeometry(static_cast<RootNodeEntityItem *>(item)->entity(), fromQRect(dialog.geometry()));
+        }
+        else
+            QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+//    else
+//        if (item->isFiles())
+//        {
+//            if (static_cast<RootNodeFilesItem *>(item)->node() == NULL)
+//            {
+//                IFileContainer::Holder folder(m_container->container()->open());
+//                Node *node = new FolderNode(folder, m_container, this);
+//                static_cast<RootNodeFilesItem *>(item)->setNode(node);
+//            }
+//
+//            return static_cast<RootNodeFilesItem *>(item)->node();
+//        }
+
+    return Interface::Holder();
 }
 
 RootNode::size_type RootNode::size() const

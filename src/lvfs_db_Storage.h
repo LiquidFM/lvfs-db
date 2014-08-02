@@ -42,6 +42,7 @@ public:
 
     /* IStorage */
     virtual bool isDbValid() const;
+    virtual const char *lastError() const;
     virtual const LiquidDb::Storage::Entities &entities() const;
 
     virtual bool transaction();
@@ -53,6 +54,12 @@ public:
 
     virtual Schemas schema(const Entity &entity) const;
     virtual bool setSchema(const Entity &entity, Schemas schema);
+
+    virtual Rect editorGeometry(const Entity &entity) const;
+    virtual bool setEditorGeometry(const Entity &entity, const Rect &geometry);
+
+    virtual Rect listGeometry(const Entity &entity) const;
+    virtual bool setListGeometry(const Entity &entity, const Rect &geometry);
 
     virtual Entity createEntity(Entity::Type type, const EFC::String &name, const EFC::String &title);
     virtual bool removeEntity(const Entity &entity);

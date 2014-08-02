@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2012 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,33 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_RootNodeEntityItem.h"
-#include "../../../lvfs_db_common.h"
+#ifndef LVFS_DB_VALUELISTPROXYMODEL_H_
+#define LVFS_DB_VALUELISTPROXYMODEL_H_
+
+#include <platform/utils.h>
+#include <QtGui/QSortFilterProxyModel>
 
 
 namespace LVFS {
 namespace Db {
 
-RootNodeEntityItem::RootNodeEntityItem(const Entity &entity, Base *parent) :
-    RootNodeListItem(parent),
-    m_entity(entity),
-    m_entityName(toUnicode(m_entity.name()))
-{}
-
-QVariant RootNodeEntityItem::data(qint32 column, qint32 role) const
+class ValueListProxyModel : public QSortFilterProxyModel
 {
-    if (role == Qt::DisplayRole)
-        return m_entityName;
-    else
-        return QVariant();
-}
+    PLATFORM_MAKE_NONCOPYABLE(ValueListProxyModel)
 
-bool RootNodeEntityItem::isEntity()
-{
-    return true;
-}
+public:
+    ValueListProxyModel(QObject *parent = 0);
+
+    void setFilter(const QString &filter);
+
+protected:
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+
+private:
+    QString m_filter;
+};
 
 }}
+
+#endif /* LVFS_DB_VALUELISTPROXYMODEL_H_ */

@@ -39,6 +39,11 @@ bool Storage::isDbValid() const
     return m_storage.isValid();
 }
 
+const char *Storage::lastError() const
+{
+    return "";
+}
+
 const LiquidDb::Storage::Entities &Storage::entities() const
 {
     return m_storage.entities();
@@ -82,6 +87,62 @@ Storage::Schemas Storage::schema(const Entity &entity) const
 bool Storage::setSchema(const Entity &entity, Schemas schema)
 {
     return m_storage.setMetaPropertyValue(entity, Schema, EFC::Variant(schema));
+}
+
+Storage::Rect Storage::editorGeometry(const Entity &entity) const
+{
+    ::EFC::Variant value(m_storage.metaPropertyValue(entity, EditorGeometry));
+
+    if (value.isValid())
+    {
+        size_t size;
+        const int32_t *data = reinterpret_cast<const int32_t *>(value.asBinary(size));
+        ASSERT(size == sizeof(int32_t) * 4);
+        return { data[0], data[1], data[2], data[3] };
+    }
+
+    return { 0, 0, 0, 0 };
+}
+
+bool Storage::setEditorGeometry(const Entity &entity, const Rect &geometry)
+{
+    unsigned char buffer[sizeof(int32_t) * 4];
+    int32_t *data = reinterpret_cast<int32_t *>(buffer);
+
+    data[0] = geometry.x;
+    data[1] = geometry.y;
+    data[2] = geometry.width;
+    data[3] = geometry.height;
+
+    return m_storage.setMetaPropertyValue(entity, EditorGeometry, ::EFC::Variant(buffer, sizeof(buffer)));
+}
+
+Storage::Rect Storage::listGeometry(const Entity &entity) const
+{
+    ::EFC::Variant value(m_storage.metaPropertyValue(entity, ListGeometry));
+
+    if (value.isValid())
+    {
+        size_t size;
+        const int32_t *data = reinterpret_cast<const int32_t *>(value.asBinary(size));
+        ASSERT(size == sizeof(int32_t) * 4);
+        return { data[0], data[1], data[2], data[3] };
+    }
+
+    return { 0, 0, 0, 0 };
+}
+
+bool Storage::setListGeometry(const Entity &entity, const Rect &geometry)
+{
+    unsigned char buffer[sizeof(int32_t) * 4];
+    int32_t *data = reinterpret_cast<int32_t *>(buffer);
+
+    data[0] = geometry.x;
+    data[1] = geometry.y;
+    data[2] = geometry.width;
+    data[3] = geometry.height;
+
+    return m_storage.setMetaPropertyValue(entity, ListGeometry, ::EFC::Variant(buffer, sizeof(buffer)));
 }
 
 Entity Storage::createEntity(Entity::Type type, const EFC::String &name, const EFC::String &title)

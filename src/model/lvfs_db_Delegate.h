@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2012 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,26 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_RootNodeEntityItem.h"
-#include "../../../lvfs_db_common.h"
+#ifndef LVFS_DB_DELEGATE_H_
+#define LVFS_DB_DELEGATE_H_
+
+#include <QtGui/QStyledItemDelegate>
 
 
 namespace LVFS {
 namespace Db {
 
-RootNodeEntityItem::RootNodeEntityItem(const Entity &entity, Base *parent) :
-    RootNodeListItem(parent),
-    m_entity(entity),
-    m_entityName(toUnicode(m_entity.name()))
-{}
-
-QVariant RootNodeEntityItem::data(qint32 column, qint32 role) const
+class Delegate : public QStyledItemDelegate
 {
-    if (role == Qt::DisplayRole)
-        return m_entityName;
-    else
-        return QVariant();
-}
+    Q_DISABLE_COPY(Delegate)
 
-bool RootNodeEntityItem::isEntity()
-{
-    return true;
-}
+public:
+    Delegate(QObject *parent = 0);
+
+    virtual void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
 
 }}
+
+#endif /* LVFS_DB_DELEGATE_H_ */

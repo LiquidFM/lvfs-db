@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2012 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,21 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_RootNodeEntityItem.h"
-#include "../../../lvfs_db_common.h"
+#ifndef LVFS_DB_SELECTABLEVALUELISTDIALOG_H_
+#define LVFS_DB_SELECTABLEVALUELISTDIALOG_H_
+
+#include "../editable/lvfs_db_EditableValueListDialog.h"
 
 
-namespace LVFS {
-namespace Db {
-
-RootNodeEntityItem::RootNodeEntityItem(const Entity &entity, Base *parent) :
-    RootNodeListItem(parent),
-    m_entity(entity),
-    m_entityName(toUnicode(m_entity.name()))
-{}
-
-QVariant RootNodeEntityItem::data(qint32 column, qint32 role) const
+class SelectableValueListDialog : public EditableValueListDialog
 {
-    if (role == Qt::DisplayRole)
-        return m_entityName;
-    else
-        return QVariant();
-}
+    Q_OBJECT
 
-bool RootNodeEntityItem::isEntity()
-{
-    return true;
-}
+public:
+    SelectableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent = 0);
 
-}}
+    EntityValue takeValue() { return EditableValueListDialog::takeValue(); }
+    virtual void accept();
+};
+
+#endif /* LVFS_DB_SELECTABLEVALUELISTDIALOG_H_ */

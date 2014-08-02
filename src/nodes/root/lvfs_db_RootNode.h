@@ -66,6 +66,8 @@ public:
     virtual QModelIndex currentIndex() const;
     virtual void setCurrentIndex(const QModelIndex &index);
 
+    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent);
+
 protected:
     /* Core::Tools::TreeModel */
     virtual size_type size() const;

@@ -58,10 +58,19 @@ public:
         Rating
     };
 
+    struct Rect
+    {
+        int x;
+        int y;
+        int width;
+        int height;
+    };
+
 public:
     virtual ~IStorage();
 
     virtual bool isDbValid() const = 0;
+    virtual const char *lastError() const = 0;
     virtual const LiquidDb::Storage::Entities &entities() const = 0;
 
     virtual bool transaction() = 0;
@@ -73,6 +82,12 @@ public:
 
     virtual Schemas schema(const Entity &entity) const = 0;
     virtual bool setSchema(const Entity &entity, Schemas schema) = 0;
+
+    virtual Rect editorGeometry(const Entity &entity) const = 0;
+    virtual bool setEditorGeometry(const Entity &entity, const Rect &geometry) = 0;
+
+    virtual Rect listGeometry(const Entity &entity) const = 0;
+    virtual bool setListGeometry(const Entity &entity, const Rect &geometry) = 0;
 
     virtual Entity createEntity(Entity::Type type, const ::EFC::String &name, const ::EFC::String &title) = 0;
     virtual bool removeEntity(const Entity &entity) = 0;

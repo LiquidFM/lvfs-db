@@ -17,6 +17,8 @@ add_definitions (${QT_DEFINITIONS} -DQT_NO_CAST_FROM_ASCII)
 
 # Sources
 add_subdirectory (src)
+QT4_WRAP_CPP (${PROJECT_NAME}_MOC_SOURCES ${${PROJECT_NAME}_HEADERS} OPTIONS "-nw")
+list (APPEND ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_MOC_SOURCES})
 
 # Target - lvfs-db
 add_library(lvfs-db SHARED ${${PROJECT_NAME}_SOURCES})

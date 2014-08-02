@@ -17,41 +17,35 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_INODE_H_
-#define LVFS_DB_INODE_H_
+#ifndef LVFS_DB_COMPOSITEVALUEPOSSIBLEFILEITEM_H_
+#define LVFS_DB_COMPOSITEVALUEPOSSIBLEFILEITEM_H_
 
-#include <efc/List>
-#include <efc/Pair>
-#include <lvfs/Interface>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QWidget>
+#include "lvfs_db_CompositeValuePathItem.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE INode
+class CompositeValuePossibleFileItem : public CompositeValuePathItem
 {
-    DECLARE_INTERFACE(LVFS::Db::INode)
-
 public:
-    typedef EFC::List<qint32>                  Geometry;
-    typedef EFC::Pair<qint32, ::Qt::SortOrder> Sorting;
+    CompositeValuePossibleFileItem(const EntityValue &value, const Interface::Holder &source, Base *parent = 0);
 
-public:
-    virtual ~INode();
+    /* IdmItem */
+    virtual QVariant data(qint32 column, qint32 role) const;
 
-    virtual QAbstractItemModel *model() const = 0;
+    /* CompositeValuePathItem */
+    virtual QString fileName() const;
+    virtual bool isFile() const;
+    virtual void open() const;
 
-    virtual const Geometry &geometry() const = 0;
-    virtual const Sorting &sorting() const = 0;
+protected:
+    const Interface::Holder &source() const { return m_source; }
 
-    virtual QModelIndex currentIndex() const = 0;
-    virtual void setCurrentIndex(const QModelIndex &index) = 0;
-
-    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent) = 0;
+private:
+    Interface::Holder m_source;
 };
 
 }}
 
-#endif /* LVFS_DB_INODE_H_ */
+#endif /* LVFS_DB_COMPOSITEVALUEPOSSIBLEFILEITEM_H_ */

@@ -17,41 +17,37 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_INODE_H_
-#define LVFS_DB_INODE_H_
+#ifndef LVFS_DB_ENTITIESLISTMODELITEM_H_
+#define LVFS_DB_ENTITIESLISTMODELITEM_H_
 
-#include <efc/List>
-#include <efc/Pair>
-#include <lvfs/Interface>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QWidget>
+#include <liquiddb/Entity>
+#include "../../../../model/lvfs_db_Model.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE INode
+using namespace LiquidDb;
+
+
+class EntitiesListItem : public Model::ListItem
 {
-    DECLARE_INTERFACE(LVFS::Db::INode)
-
 public:
-    typedef EFC::List<qint32>                  Geometry;
-    typedef EFC::Pair<qint32, ::Qt::SortOrder> Sorting;
+    EntitiesListItem(const Entity::Property &property, Model::Item *parent = 0);
 
-public:
-    virtual ~INode();
+    /* IdmItem */
+    virtual QVariant data(qint32 column, qint32 role) const;
 
-    virtual QAbstractItemModel *model() const = 0;
+    const Entity &entity() const { return m_property.entity; }
+    const Entity::Property &property() const { return m_property; }
 
-    virtual const Geometry &geometry() const = 0;
-    virtual const Sorting &sorting() const = 0;
+    void setEntity(const Entity &value) { m_property.entity = value; }
+    void setName(const ::EFC::String &name) { m_property.name = name; }
 
-    virtual QModelIndex currentIndex() const = 0;
-    virtual void setCurrentIndex(const QModelIndex &index) = 0;
-
-    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent) = 0;
+private:
+    Entity::Property m_property;
 };
 
 }}
 
-#endif /* LVFS_DB_INODE_H_ */
+#endif /* LVFS_DB_ENTITIESLISTMODELITEM_H_ */

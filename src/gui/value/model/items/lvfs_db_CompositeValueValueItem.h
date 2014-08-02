@@ -17,41 +17,36 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_INODE_H_
-#define LVFS_DB_INODE_H_
+#ifndef LVFS_DB_COMPOSITEVALUEVALUEITEM_H_
+#define LVFS_DB_COMPOSITEVALUEVALUEITEM_H_
 
-#include <efc/List>
-#include <efc/Pair>
-#include <lvfs/Interface>
-#include <QtCore/QAbstractItemModel>
-#include <QtGui/QWidget>
+#include "lvfs_db_CompositeValueItem.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE INode
+using namespace LiquidDb;
+
+
+class CompositeValueValueItem : public CompositeValueItem
 {
-    DECLARE_INTERFACE(LVFS::Db::INode)
-
 public:
-    typedef EFC::List<qint32>                  Geometry;
-    typedef EFC::Pair<qint32, ::Qt::SortOrder> Sorting;
+    CompositeValueValueItem(const EntityValue &value, Base *parent = 0);
 
-public:
-    virtual ~INode();
+    /* Base */
+    virtual QVariant data(qint32 column, qint32 role) const;
 
-    virtual QAbstractItemModel *model() const = 0;
+    /* CompositeValueItem */
+    virtual bool isValue() const;
 
-    virtual const Geometry &geometry() const = 0;
-    virtual const Sorting &sorting() const = 0;
+    const EntityValue &value() const { return m_value; }
+    EntityValue take() { EntityValue res(m_value); m_value = EntityValue(); return res; }
 
-    virtual QModelIndex currentIndex() const = 0;
-    virtual void setCurrentIndex(const QModelIndex &index) = 0;
-
-    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent) = 0;
+protected:
+    EntityValue m_value;
 };
 
 }}
 
-#endif /* LVFS_DB_INODE_H_ */
+#endif /* LVFS_DB_COMPOSITEVALUEVALUEITEM_H_ */

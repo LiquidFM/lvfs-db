@@ -18,8 +18,7 @@
  */
 
 #include "lvfs_db_RootNodePropertyItem.h"
-
-#include <lvfs-core/models/Qt/BaseNode>
+#include "../../../lvfs_db_common.h"
 
 
 namespace LVFS {
@@ -28,13 +27,13 @@ namespace Db {
 RootNodePropertyItem::RootNodePropertyItem(const Entity::Property &property, Base *parent) :
     RootNodeEntityItem(property.entity, parent),
     m_property(property),
-    m_label(QString(Core::Qt::BaseNode::toUnicode(m_property.name.c_str())).append(QString::fromLatin1(" (")).append(Core::Qt::BaseNode::toUnicode(m_property.entity.name().c_str())).append(QChar(L')')))
+    m_label(QString(toUnicode(m_property.name)).append(QString::fromLatin1(" (")).append(toUnicode(m_property.entity.name())).append(QChar(L')')))
 {}
 
 RootNodePropertyItem::RootNodePropertyItem(const Entity &property, const ::EFC::String &name, Base *parent) :
     RootNodeEntityItem(property, parent),
     m_property(property, name),
-    m_label(QString(Core::Qt::BaseNode::toUnicode(m_property.name.c_str())).append(QString::fromLatin1(" (")).append(Core::Qt::BaseNode::toUnicode(m_property.entity.name().c_str())).append(QChar(L')')))
+    m_label(QString(toUnicode(m_property.name)).append(QString::fromLatin1(" (")).append(toUnicode(m_property.entity.name())).append(QChar(L')')))
 {}
 
 QVariant RootNodePropertyItem::data(qint32 column, qint32 role) const
@@ -52,7 +51,7 @@ bool RootNodePropertyItem::isProperty()
 
 QString RootNodePropertyItem::name() const
 {
-    return Core::Qt::BaseNode::toUnicode(m_property.name.c_str());
+    return toUnicode(m_property.name);
 }
 
 }}
