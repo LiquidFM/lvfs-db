@@ -145,7 +145,15 @@ void RootView::removeShortcut()
 
 void RootView::searchShortcut()
 {
+    QModelIndex index = m_view.selectionModel()->currentIndex();
 
+    if (index.isValid())
+    {
+        Interface::Holder newNode = m_node->as<Db::INode>()->search(index, &m_view);
+
+        if (newNode.isValid())
+            m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
+    }
 }
 
 }}

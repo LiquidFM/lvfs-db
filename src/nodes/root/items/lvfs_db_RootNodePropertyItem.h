@@ -29,8 +29,8 @@ namespace Db {
 class RootNodePropertyItem : public RootNodeEntityItem
 {
 public:
-    RootNodePropertyItem(const Entity::Property &property, Base *parent);
-    RootNodePropertyItem(const Entity &property, const ::EFC::String &name, Base *parent);
+    RootNodePropertyItem(const Entity::Property &property, Item *parent);
+    RootNodePropertyItem(const Entity &property, const ::EFC::String &name, Item *parent);
 
     /* Base */
     virtual QVariant data(qint32 column, qint32 role) const;

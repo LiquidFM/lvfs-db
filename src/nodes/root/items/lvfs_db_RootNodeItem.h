@@ -30,7 +30,7 @@ namespace Db {
 class RootNodeItem : public Core::Tools::TreeModel::Item
 {
 public:
-    RootNodeItem(Base *parent);
+    RootNodeItem(Item *parent);
 
     virtual bool isFiles();
     virtual bool isEntity();
@@ -44,13 +44,13 @@ public:
     typedef EFC::Vector<RootNodeItem *> Container;
 
 public:
-    RootNodeListItem(Base *parent);
+    RootNodeListItem(Item *parent);
     virtual ~RootNodeListItem();
 
     /* Base */
-    virtual Base *at(size_type index) const;
+    virtual Item *at(size_type index) const;
     virtual size_type size() const;
-    virtual size_type indexOf(Base *item) const;
+    virtual size_type indexOf(Item *item) const;
 
 protected:
     Container m_items;

@@ -23,7 +23,7 @@
 namespace LVFS {
 namespace Db {
 
-CompositeValuePathItem::CompositeValuePathItem(const EntityValue &value, Base *parent) :
+CompositeValuePathItem::CompositeValuePathItem(const EntityValue &value, Model::Item *parent) :
     CompositeValueItem(parent),
     m_value(value)
 {}

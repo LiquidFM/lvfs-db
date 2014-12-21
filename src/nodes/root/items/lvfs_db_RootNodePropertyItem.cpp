@@ -24,13 +24,13 @@
 namespace LVFS {
 namespace Db {
 
-RootNodePropertyItem::RootNodePropertyItem(const Entity::Property &property, Base *parent) :
+RootNodePropertyItem::RootNodePropertyItem(const Entity::Property &property, Item *parent) :
     RootNodeEntityItem(property.entity, parent),
     m_property(property),
     m_label(QString(toUnicode(m_property.name)).append(QString::fromLatin1(" (")).append(toUnicode(m_property.entity.name())).append(QChar(L')')))
 {}
 
-RootNodePropertyItem::RootNodePropertyItem(const Entity &property, const ::EFC::String &name, Base *parent) :
+RootNodePropertyItem::RootNodePropertyItem(const Entity &property, const ::EFC::String &name, Item *parent) :
     RootNodeEntityItem(property, parent),
     m_property(property, name),
     m_label(QString(toUnicode(m_property.name)).append(QString::fromLatin1(" (")).append(toUnicode(m_property.entity.name())).append(QChar(L')')))

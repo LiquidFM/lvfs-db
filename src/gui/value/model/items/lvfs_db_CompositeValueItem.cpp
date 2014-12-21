@@ -23,7 +23,7 @@
 namespace LVFS {
 namespace Db {
 
-CompositeValueItem::CompositeValueItem(Base *parent) :
+CompositeValueItem::CompositeValueItem(Item *parent) :
     Item(parent)
 {}
 

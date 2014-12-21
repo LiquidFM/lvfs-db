@@ -23,7 +23,7 @@
 namespace LVFS {
 namespace Db {
 
-CompositeValuePropertyItem::CompositeValuePropertyItem(const Entity::Property &property, Base *parent) :
+CompositeValuePropertyItem::CompositeValuePropertyItem(const Entity::Property &property, Model::Item *parent) :
     CompositeValueItem(parent),
     m_property(property)
 {}
@@ -33,7 +33,7 @@ CompositeValuePropertyItem::~CompositeValuePropertyItem()
     qDeleteAll(m_items);
 }
 
-CompositeValuePropertyItem::Base *CompositeValuePropertyItem::at(size_type index) const
+Model::Item *CompositeValuePropertyItem::at(size_type index) const
 {
     return m_items.at(index);
 }
@@ -43,7 +43,7 @@ CompositeValuePropertyItem::size_type CompositeValuePropertyItem::size() const
     return m_items.size();
 }
 
-CompositeValuePropertyItem::size_type CompositeValuePropertyItem::indexOf(Base *item) const
+CompositeValuePropertyItem::size_type CompositeValuePropertyItem::indexOf(Model::Item *item) const
 {
     return m_items.indexOf(item);
 }

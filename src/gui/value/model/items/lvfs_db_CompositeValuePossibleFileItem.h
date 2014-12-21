@@ -29,7 +29,7 @@ namespace Db {
 class CompositeValuePossibleFileItem : public CompositeValuePathItem
 {
 public:
-    CompositeValuePossibleFileItem(const EntityValue &value, const Interface::Holder &source, Base *parent = 0);
+    CompositeValuePossibleFileItem(const EntityValue &value, const Interface::Holder &source, Model::Item *parent = 0);
 
     /* IdmItem */
     virtual QVariant data(qint32 column, qint32 role) const;

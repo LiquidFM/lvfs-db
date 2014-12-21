@@ -17,48 +17,45 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_COMPOSITEVALUEPOSSIBLEDIRITEM_H_
-#define LVFS_DB_COMPOSITEVALUEPOSSIBLEDIRITEM_H_
+#ifndef LVFS_DB_QUERYENTITIESMODELITEM_H_
+#define LVFS_DB_QUERYENTITIESMODELITEM_H_
 
-#include "lvfs_db_CompositeValuePathItem.h"
+#include <efc/Vector>
+#include <liquiddb/Entity>
+#include "../../../../../model/lvfs_db_Model.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class CompositeValuePossibleDirItem : public CompositeValuePathItem
+using namespace LiquidDb;
+
+
+class QueryEntitiesModelItem : public Model::Item
 {
 public:
-    typedef QList<Model::Item *> Container;
-
-public:
-    CompositeValuePossibleDirItem(const EntityValue &value, const Interface::Holder &source, Model::Item *parent = 0);
-    virtual ~CompositeValuePossibleDirItem();
+    QueryEntitiesModelItem(const Entity::Property &property, Model::Item *parent = 0);
+    virtual ~QueryEntitiesModelItem();
 
     /* Base */
     virtual Model::Item *at(size_type index) const;
     virtual size_type size() const;
     virtual size_type indexOf(Model::Item *item) const;
-
-    /* Base */
     virtual QVariant data(qint32 column, qint32 role) const;
 
-    /* CompositeValuePathItem */
-    virtual QString fileName() const;
-    virtual bool isFile() const;
-    virtual void open() const;
+    const Entity &entity() const { return m_property.entity; }
+    const Entity::Property &property() const { return m_property; }
 
 protected:
-    friend class CompositeValueModel;
+    friend class QueryEntitiesModel;
     void add(Model::Item *item) { m_items.push_back(item); }
-    void remove(size_type index) { delete m_items.takeAt(index); }
-    const Interface::Holder &source() const { return m_source; }
+    void remove(size_type index) { m_items.erase(m_items.begin() + index); }
 
 private:
-    Interface::Holder m_source;
-    Container m_items;
+    Entity::Property m_property;
+    EFC::Vector<Model::Item *> m_items;
 };
 
 }}
 
-#endif /* LVFS_DB_COMPOSITEVALUEPOSSIBLEDIRITEM_H_ */
+#endif /* LVFS_DB_QUERYENTITIESMODELITEM_H_ */

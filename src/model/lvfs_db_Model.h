@@ -36,13 +36,13 @@ public:
         typedef EFC::Vector<Item *> Container;
 
     public:
-        ListItem(Base *parent);
+        ListItem(Item *parent);
         virtual ~ListItem();
 
         /* Base */
-        virtual Base *at(size_type index) const;
+        virtual Item *at(size_type index) const;
         virtual size_type size() const;
-        virtual size_type indexOf(Base *item) const;
+        virtual size_type indexOf(Item *item) const;
 
     protected:
         Container m_items;

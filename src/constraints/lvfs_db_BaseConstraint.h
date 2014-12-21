@@ -17,37 +17,35 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#ifndef LVFS_DB_BASECONSTRAINT_H_
+#define LVFS_DB_BASECONSTRAINT_H_
+
+#include <QtCore/QSharedData>
+#include <liquiddb/EntityConstraint>
+#include <efc/Holder>
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
-
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+class BaseConstraint : public ::EFC::Holder<BaseConstraint>::Data
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
-}
+public:
+    typedef ::EFC::Holder<BaseConstraint> Holder;
 
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
+public:
+	BaseConstraint(BaseConstraint *parent = 0);
+	virtual ~BaseConstraint();
 
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
+	BaseConstraint *parent() const { return m_parent; }
 
-void CompositeValueRealPathItem::open() const
-{
+	virtual bool isGroup() const = 0;
+	virtual const LiquidDb::Constraint &constraint() const = 0;
 
-}
+private:
+	BaseConstraint *m_parent;
+};
 
 }}
+
+#endif /* LVFS_DB_BASECONSTRAINT_H_ */

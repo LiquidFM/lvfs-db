@@ -32,7 +32,7 @@ namespace Db {
 class CompositeValueItem : public Model::Item
 {
 public:
-    CompositeValueItem(Base *parent = 0);
+    CompositeValueItem(Item *parent = 0);
 
     virtual bool isPath() const;
     virtual bool isValue() const;

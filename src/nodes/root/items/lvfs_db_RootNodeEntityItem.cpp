@@ -24,7 +24,7 @@
 namespace LVFS {
 namespace Db {
 
-RootNodeEntityItem::RootNodeEntityItem(const Entity &entity, Base *parent) :
+RootNodeEntityItem::RootNodeEntityItem(const Entity &entity, Item *parent) :
     RootNodeListItem(parent),
     m_entity(entity),
     m_entityName(toUnicode(m_entity.name()))

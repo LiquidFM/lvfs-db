@@ -17,37 +17,36 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#ifndef LVFS_DB_VALUECONSTRAINT_H_
+#define LVFS_DB_VALUECONSTRAINT_H_
+
+#include "../lvfs_db_BaseConstraint.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
+using namespace LiquidDb;
 
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+
+class ValueConstraint : public BaseConstraint
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
-}
+public:
+    ValueConstraint(const Entity::Property &property, Constraint::Operator op, const EntityValue &value, BaseConstraint *parent = 0);
 
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
+	/* BaseConstraint */
+	virtual bool isGroup() const;
+    virtual const Constraint &constraint() const;
 
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
+	const Entity::Property &property() const { return m_property; }
+	Constraint::Operator op() const { return m_constraint.op(); }
+	const EntityValue &value() const { return m_constraint.value(); }
 
-void CompositeValueRealPathItem::open() const
-{
-
-}
+private:
+	Entity::Property m_property;
+	EntityConstraint m_constraint;
+};
 
 }}
+
+#endif /* LVFS_DB_VALUECONSTRAINT_H_ */

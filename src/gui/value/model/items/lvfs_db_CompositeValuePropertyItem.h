@@ -39,9 +39,9 @@ public:
     virtual ~CompositeValuePropertyItem();
 
     /* Base */
-    virtual Base *at(size_type index) const;
+    virtual Model::Item *at(size_type index) const;
     virtual size_type size() const;
-    virtual size_type indexOf(Base *item) const;
+    virtual size_type indexOf(Model::Item *item) const;
 
     virtual QVariant data(qint32 column, qint32 role) const;
 

@@ -17,37 +17,12 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#include "lvfs_db_RatingValueDialog.h"
 
 
-namespace LVFS {
-namespace Db {
-
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
-
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+RatingValueDialog::RatingValueDialog(const QString &title, QWidget *parent) :
+    NestedPlainDialog(parent),
+    m_mainWidget(this)
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
+    setCentralWidget(&m_mainWidget);
 }
-
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
-
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
-
-void CompositeValueRealPathItem::open() const
-{
-
-}
-
-}}

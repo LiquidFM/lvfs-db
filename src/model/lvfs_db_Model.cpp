@@ -23,7 +23,7 @@
 namespace LVFS {
 namespace Db {
 
-Model::ListItem::ListItem(Base *parent) :
+Model::ListItem::ListItem(Item *parent) :
     Item(parent)
 {}
 
@@ -33,19 +33,19 @@ Model::ListItem::~ListItem()
         delete i;
 }
 
-Model::ListItem::Base *Model::ListItem::at(size_type index) const
+Model::Item *Model::ListItem::at(size_type index) const
 {
     return m_items.at(index);
 }
 
-Model::ListItem::size_type Model::ListItem::size() const
+Model::Item::size_type Model::ListItem::size() const
 {
     return m_items.size();
 }
 
-Model::ListItem::size_type Model::ListItem::indexOf(Base *item) const
+Model::ListItem::size_type Model::ListItem::indexOf(Item *item) const
 {
-    for (EFC::Vector<Item *>::const_iterator i = m_items.begin(); i != m_items.end(); ++i)
+    for (auto i = m_items.begin(); i != m_items.end(); ++i)
         if (*i == item)
             return i - m_items.begin();
 
@@ -74,7 +74,7 @@ Model::Item *Model::at(size_type index) const
 
 Model::size_type Model::indexOf(Item *item) const
 {
-    for (EFC::Vector<Item *>::const_iterator i = m_items.begin(); i != m_items.end(); ++i)
+    for (auto i = m_items.begin(); i != m_items.end(); ++i)
         if (*i == item)
             return i - m_items.begin();
 

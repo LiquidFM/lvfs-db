@@ -18,10 +18,10 @@
  */
 
 #include "lvfs_db_EditableValueListWidget.h"
-#include "../../../simple/widgets/idm_simplevaluewidget.h"
-#include "../../../simple/rating/widgets/idm_ratingvaluewidget.h"
 #include "../../../composite/widgets/lvfs_db_CompositeValueWidget.h"
 #include "../../../../../lvfs_db_common.h"
+#include "../../../simple/rating/widgets/lvfs_db_RatingValueWidget.h"
+#include "../../../simple/widgets/lvfs_db_SimpleValueWidget.h"
 
 
 template <Entity::Type EntityType>

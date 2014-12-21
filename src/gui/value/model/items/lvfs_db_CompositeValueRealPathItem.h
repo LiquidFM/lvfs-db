@@ -29,7 +29,7 @@ namespace Db {
 class CompositeValueRealPathItem : public CompositeValuePathItem
 {
 public:
-    CompositeValueRealPathItem(const EntityValue &value, Base *parent = 0);
+    CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent = 0);
 
     /* Base */
     virtual QVariant data(qint32 column, qint32 role) const;

@@ -17,37 +17,27 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#ifndef LVFS_DB_QUERYCONSTRAINTSDELEGATE_H_
+#define LVFS_DB_QUERYCONSTRAINTSDELEGATE_H_
+
+#include "../../../../model/lvfs_db_Delegate.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
-
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+class QueryConstraintsDelegate : public Delegate
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
-}
+    Q_DISABLE_COPY(QueryConstraintsDelegate)
 
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
+public:
+    QueryConstraintsDelegate(QObject *parent = 0);
 
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
-
-void CompositeValueRealPathItem::open() const
-{
-
-}
+    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+};
 
 }}
+
+#endif /* LVFS_DB_QUERYCONSTRAINTSDELEGATE_H_ */

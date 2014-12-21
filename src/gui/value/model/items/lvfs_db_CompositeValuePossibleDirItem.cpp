@@ -29,10 +29,10 @@ namespace Db {
 class CompositeValueFakePossibleDirItem : public CompositeValuePossibleDirItem
 {
 public:
-    typedef QList<Base *> Container;
+    typedef QList<Model::Item *> Container;
 
 public:
-    CompositeValueFakePossibleDirItem(const Interface::Holder &source, Base *parent = 0) :
+    CompositeValueFakePossibleDirItem(const Interface::Holder &source, Model::Item *parent = 0) :
         CompositeValuePossibleDirItem(EntityValue(), source, parent)
     {}
 
@@ -60,7 +60,7 @@ public:
 class CompositeValueFakePossibleFileItem : public CompositeValuePossibleFileItem
 {
 public:
-    CompositeValueFakePossibleFileItem(const Interface::Holder &source, Base *parent = 0) :
+    CompositeValueFakePossibleFileItem(const Interface::Holder &source, Model::Item *parent = 0) :
         CompositeValuePossibleFileItem(EntityValue(), source, parent)
     {}
 
@@ -98,7 +98,7 @@ static bool lessThan(CompositeValuePossibleDirItem::Container::value_type v1, Co
             return Core::Qt::SortFilterModel::compareFileNames(static_cast<CompositeValuePathItem *>(v1)->fileName(), static_cast<CompositeValuePathItem *>(v2)->fileName());
 }
 
-CompositeValuePossibleDirItem::CompositeValuePossibleDirItem(const EntityValue &value, const Interface::Holder &source, Base *parent) :
+CompositeValuePossibleDirItem::CompositeValuePossibleDirItem(const EntityValue &value, const Interface::Holder &source, Model::Item *parent) :
     CompositeValuePathItem(value, parent),
     m_source(source)
 {
@@ -122,7 +122,7 @@ CompositeValuePossibleDirItem::~CompositeValuePossibleDirItem()
     qDeleteAll(m_items);
 }
 
-CompositeValuePossibleDirItem::Base *CompositeValuePossibleDirItem::at(size_type index) const
+Model::Item *CompositeValuePossibleDirItem::at(size_type index) const
 {
     return m_items.at(index);
 }
@@ -132,7 +132,7 @@ CompositeValuePossibleDirItem::size_type CompositeValuePossibleDirItem::size() c
     return m_items.size();
 }
 
-CompositeValuePossibleDirItem::size_type CompositeValuePossibleDirItem::indexOf(Base *item) const
+CompositeValuePossibleDirItem::size_type CompositeValuePossibleDirItem::indexOf(Model::Item *item) const
 {
     return m_items.indexOf(item);
 }

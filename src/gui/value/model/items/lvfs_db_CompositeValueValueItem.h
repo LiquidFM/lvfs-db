@@ -32,7 +32,7 @@ using namespace LiquidDb;
 class CompositeValueValueItem : public CompositeValueItem
 {
 public:
-    CompositeValueValueItem(const EntityValue &value, Base *parent = 0);
+    CompositeValueValueItem(const EntityValue &value, Model::Item *parent = 0);
 
     /* Base */
     virtual QVariant data(qint32 column, qint32 role) const;

@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2012 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,61 +17,49 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_RootNodeItem.h"
+#include "lvfs_db_QueryEntitiesModelItem.h"
+#include "../../../../../lvfs_db_common.h"
 
-#include "lvfs_db_RootNodeEntityItem.h"
 
 namespace LVFS {
 namespace Db {
 
-RootNodeItem::RootNodeItem(Item *parent) :
-    Item(parent)
+QueryEntitiesModelItem::QueryEntitiesModelItem(const Entity::Property &property, Model::Item *parent) :
+    Model::Item(parent),
+    m_property(property)
 {}
 
-bool RootNodeItem::isFiles()
-{
-    return false;
-}
-
-bool RootNodeItem::isEntity()
-{
-    return false;
-}
-
-bool RootNodeItem::isProperty()
-{
-    return false;
-}
-
-RootNodeListItem::RootNodeListItem(Item *parent) :
-    RootNodeItem(parent)
-{}
-
-RootNodeListItem::~RootNodeListItem()
+QueryEntitiesModelItem::~QueryEntitiesModelItem()
 {
     for (auto &i : m_items)
         delete i;
-
-    m_items.clear();
 }
 
-RootNodeListItem::Item *RootNodeListItem::at(size_type index) const
+Model::Item *QueryEntitiesModelItem::at(size_type index) const
 {
-    return m_items.at(index);
+    return m_items[index];
 }
 
-RootNodeListItem::size_type RootNodeListItem::size() const
+QueryEntitiesModelItem::size_type QueryEntitiesModelItem::size() const
 {
     return m_items.size();
 }
 
-RootNodeListItem::size_type RootNodeListItem::indexOf(Item *item) const
+QueryEntitiesModelItem::size_type QueryEntitiesModelItem::indexOf(Model::Item *item) const
 {
-    for (auto i = m_items.begin(), end = m_items.end(); i != end; ++i)
+    for (auto i = m_items.begin(); i != m_items.end(); ++i)
         if (*i == item)
             return i - m_items.begin();
 
     return InvalidIndex;
+}
+
+QVariant QueryEntitiesModelItem::data(qint32 column, qint32 role) const
+{
+    if (column == 0 && role == Qt::DisplayRole)
+        return toUnicode(m_property.name);
+    else
+        return QVariant();
 }
 
 }}

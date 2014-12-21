@@ -17,37 +17,21 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#ifndef LVFS_DB_QUERYCONSTRAINTSROOTITEM_H_
+#define LVFS_DB_QUERYCONSTRAINTSROOTITEM_H_
+
+#include "../../../../../constraints/group/lvfs_db_GroupConstraint.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
-
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+class QueryConstraintsRootItem : public GroupConstraint
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
-}
-
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
-
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
-
-void CompositeValueRealPathItem::open() const
-{
-
-}
+public:
+    QueryConstraintsRootItem();
+};
 
 }}
+
+#endif /* LVFS_DB_QUERYCONSTRAINTSROOTITEM_H_ */

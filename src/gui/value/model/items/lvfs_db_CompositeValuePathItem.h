@@ -31,7 +31,7 @@ using namespace LiquidDb;
 class CompositeValuePathItem : public CompositeValueItem
 {
 public:
-    CompositeValuePathItem(const EntityValue &value, Base *parent = 0);
+    CompositeValuePathItem(const EntityValue &value, Model::Item *parent = 0);
 
     /* CompositeValueItem */
     virtual bool isPath() const;
