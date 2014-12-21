@@ -24,6 +24,7 @@
 #include "items/lvfs_db_RootNodeFilesItem.h"
 #include "../../lvfs_db_common.h"
 #include "../../gui/value/list/editable/lvfs_db_EditableValueListDialog.h"
+#include "../../gui/query/create/lvfs_db_CreateQueryDialog.h"
 
 #include <lvfs/IEntry>
 #include <lvfs-core/models/Qt/IView>
@@ -36,13 +37,14 @@ namespace LVFS {
 namespace Db {
 
 RootNode::RootNode(const Interface::Holder &container, const Interface::Holder &parent) :
-    Core::Qt::BaseNode(parent),
+    m_ref(0),
     m_container(container),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
 {
     ASSERT(m_container.isValid());
     ASSERT(m_sorting.first < columnCount(QModelIndex()));
+    m_parent = parent;
 }
 
 RootNode::~RootNode()
@@ -52,7 +54,7 @@ RootNode::~RootNode()
 
 const Interface::Holder &RootNode::parent() const
 {
-    return Core::Node::parent();
+    return m_parent;
 }
 
 const Interface::Holder &RootNode::file() const
@@ -67,28 +69,59 @@ void RootNode::refresh(int depth)
             doAdd(i.second);
 
     if (!m_items.empty())
-        for (auto i : views())
+        for (auto i : m_views)
             i->as<Core::Qt::IView>()->select(currentIndex());
-}
-
-void RootNode::incLinks(int count)
-{
-    Core::Node::incLinks(count);
-}
-
-void RootNode::decLinks(int count)
-{
-    Core::Node::decLinks(count);
 }
 
 void RootNode::opened(const Interface::Holder &view)
 {
-    Core::Node::opened(view);
+    m_views.insert(view);
 }
 
 void RootNode::closed(const Interface::Holder &view)
 {
-    Core::Node::closed(view);
+    m_views.erase(view);
+}
+
+int RootNode::refs() const
+{
+    return m_ref;
+}
+
+void RootNode::incRef()
+{
+    ++m_ref;
+}
+
+int RootNode::decRef()
+{
+    return --m_ref;
+}
+
+void RootNode::clear()
+{
+    if (!m_items.empty())
+    {
+        beginRemoveRows(QModelIndex(), 0, m_items.size() - 1);
+
+        for (auto &i : m_items)
+            delete i;
+
+        m_items.clear();
+        m_entities.clear();
+
+        endRemoveRows();
+    }
+}
+
+Interface::Holder RootNode::node(const Interface::Holder &file) const
+{
+    return Interface::Holder();
+}
+
+void RootNode::setNode(const Interface::Holder &file, const Interface::Holder &node)
+{
+    ASSERT(file.isValid());
 }
 
 Qt::ItemFlags RootNode::flags(const QModelIndex &index) const
@@ -119,6 +152,37 @@ QModelIndex RootNode::currentIndex() const
 void RootNode::setCurrentIndex(const QModelIndex &index)
 {
     m_currentIndex = index;
+}
+
+Interface::Holder RootNode::search(const QModelIndex &index, QWidget *parent)
+{
+    if (static_cast<RootNodeItem *>(index.internalPointer())->isEntity())
+    {
+        RootNodeEntityItem *item = static_cast<RootNodeEntityItem *>(index.internalPointer());
+
+        if (item->entity().type() == Entity::Composite)
+            if (m_container->transaction())
+            {
+                CreateQueryDialog dialog(m_container, item->entity(), parent);
+
+                if (dialog.exec() == CreateQueryDialog::Accepted)
+                {
+                    EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
+
+                    if (!m_container->commit())
+                    {
+                        QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                        m_container->rollback();
+                    }
+                }
+                else
+                    m_container->rollback();
+            }
+            else
+                QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+    }
+
+    return Interface::Holder();
 }
 
 Interface::Holder RootNode::activated(const QModelIndex &index, QWidget *parent)
@@ -179,21 +243,6 @@ RootNode::size_type RootNode::indexOf(Item *item) const
             return i - m_items.begin();
 
     return InvalidIndex;
-}
-
-void RootNode::removeChildren()
-{
-    if (!m_items.empty())
-    {
-        beginRemoveRows(QModelIndex(), 0, m_items.size() - 1);
-
-        for (auto &i : m_items)
-            delete i;
-
-        m_items.clear();
-        m_entities.clear();
-        endRemoveRows();
-    }
 }
 
 void RootNode::doAdd(const Entity &entity)

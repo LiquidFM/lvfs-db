@@ -44,20 +44,23 @@ public:
     RootNode(const Interface::Holder &container, const Interface::Holder &parent);
     virtual ~RootNode();
 
-    /* Core::INode */
+public: /* Core::INode */
     virtual const Interface::Holder &parent() const;
     virtual const Interface::Holder &file() const;
 
     virtual void refresh(int depth = 0);
-    virtual void incLinks(int count);
-    virtual void decLinks(int count);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
 
-    /* Core::Tools::TreeModel */
+    virtual int refs() const;
+    virtual void incRef();
+    virtual int decRef();
+    virtual void clear();
+
+public: /* Core::Tools::TreeModel */
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
-    /* Db::INode */
+public: /* Db::INode */
     virtual QAbstractItemModel *model() const;
 
     virtual const Geometry &geometry() const;
@@ -66,17 +69,17 @@ public:
     virtual QModelIndex currentIndex() const;
     virtual void setCurrentIndex(const QModelIndex &index);
 
+    virtual Interface::Holder search(const QModelIndex &index, QWidget *parent);
     virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent);
 
-protected:
-    /* Core::Tools::TreeModel */
+protected: /* Core::INode */
+    virtual Interface::Holder node(const Interface::Holder &file) const;
+    virtual void setNode(const Interface::Holder &file, const Interface::Holder &node);
+
+protected: /* Core::Tools::TreeModel */
     virtual size_type size() const;
     virtual Item *at(size_type index) const;
     virtual size_type indexOf(Item *item) const;
-
-protected:
-    /* Core::Node */
-    virtual void removeChildren();
 
 private:
     void doAdd(const Entity &entity);
@@ -89,9 +92,11 @@ private:
     typedef EFC::Map<Entity, EFC::Vector<Item *>> EntitiesMap;
 
 private:
+    int m_ref;
     EntitiesMap m_entities;
     EFC::Vector<Item *> m_items;
     Interface::Adaptor<IStorage> m_container;
+    EFC::Set<Interface::Holder> m_views;
     QModelIndex m_currentIndex;
 
 private:
