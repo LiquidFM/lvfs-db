@@ -19,7 +19,7 @@
 
 #include "lvfs_db_common.h"
 
-#include <lvfs-core/models/Qt/BaseNode>
+#include <lvfs-core/models/Qt/Node>
 
 
 namespace LVFS {
@@ -27,12 +27,12 @@ namespace Db {
 
 QByteArray fromUnicode(const QString &string)
 {
-    return Core::Qt::BaseNode::fromUnicode(string);
+    return Core::Qt::Node::fromUnicode(string);
 }
 
 QString toUnicode(const ::EFC::String &string)
 {
-    return Core::Qt::BaseNode::toUnicode(string.c_str());
+    return Core::Qt::Node::toUnicode(string.c_str());
 }
 
 QVariant toQVariant(const ::EFC::Variant &value)

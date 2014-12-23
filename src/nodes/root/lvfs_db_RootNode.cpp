@@ -37,29 +37,17 @@ namespace LVFS {
 namespace Db {
 
 RootNode::RootNode(const Interface::Holder &container, const Interface::Holder &parent) :
-    m_ref(0),
+    Complements<Core::Node, Db::INode>(container, parent),
     m_container(container),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
 {
-    ASSERT(m_container.isValid());
     ASSERT(m_sorting.first < columnCount(QModelIndex()));
-    m_parent = parent;
 }
 
 RootNode::~RootNode()
 {
     ASSERT(m_items.empty());
-}
-
-const Interface::Holder &RootNode::parent() const
-{
-    return m_parent;
-}
-
-const Interface::Holder &RootNode::file() const
-{
-    return m_container.interface();
 }
 
 void RootNode::refresh(int depth)
@@ -81,21 +69,6 @@ void RootNode::opened(const Interface::Holder &view)
 void RootNode::closed(const Interface::Holder &view)
 {
     m_views.erase(view);
-}
-
-int RootNode::refs() const
-{
-    return m_ref;
-}
-
-void RootNode::incRef()
-{
-    ++m_ref;
-}
-
-int RootNode::decRef()
-{
-    return --m_ref;
 }
 
 void RootNode::clear()

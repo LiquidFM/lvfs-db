@@ -26,7 +26,7 @@
 #include <liquiddb/Entity>
 #include <lvfs-db/IStorage>
 #include <lvfs-core/INode>
-#include <lvfs-core/models/Qt/BaseNode>
+#include <lvfs-core/models/Node>
 #include <lvfs-core/tools/models/TreeModel>
 #include "items/lvfs_db_RootNodeItem.h"
 #include "../../lvfs_db_INode.h"
@@ -38,23 +38,17 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE RootNode : public Implements<Core::INode, Db::INode>, public Core::Tools::TreeModel, public Core::Qt::BaseNode
+class PLATFORM_MAKE_PRIVATE RootNode : public Core::Tools::TreeModel, public Complements<Core::Node, Db::INode>
 {
 public:
     RootNode(const Interface::Holder &container, const Interface::Holder &parent);
     virtual ~RootNode();
 
 public: /* Core::INode */
-    virtual const Interface::Holder &parent() const;
-    virtual const Interface::Holder &file() const;
-
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
 
-    virtual int refs() const;
-    virtual void incRef();
-    virtual int decRef();
     virtual void clear();
 
 public: /* Core::Tools::TreeModel */
@@ -92,7 +86,6 @@ private:
     typedef EFC::Map<Entity, EFC::Vector<Item *>> EntitiesMap;
 
 private:
-    int m_ref;
     EntitiesMap m_entities;
     EFC::Vector<Item *> m_items;
     Interface::Adaptor<IStorage> m_container;
