@@ -22,9 +22,10 @@
 #include "items/lvfs_db_RootNodePropertyItem.h"
 #include "items/lvfs_db_RootNodeEntityItem.h"
 #include "items/lvfs_db_RootNodeFilesItem.h"
-#include "../../lvfs_db_common.h"
+#include "../query/lvfs_db_QueryResultsNode.h"
 #include "../../gui/value/list/editable/lvfs_db_EditableValueListDialog.h"
 #include "../../gui/query/create/lvfs_db_CreateQueryDialog.h"
+#include "../../lvfs_db_common.h"
 
 #include <lvfs/IEntry>
 #include <lvfs-core/models/Qt/IView>
@@ -142,7 +143,9 @@ Interface::Holder RootNode::search(const QModelIndex &index, QWidget *parent)
                 {
                     EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
 
-                    if (!m_container->commit())
+                    if (m_container->commit())
+                        return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
+                    else
                     {
                         QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
                         m_container->rollback();
