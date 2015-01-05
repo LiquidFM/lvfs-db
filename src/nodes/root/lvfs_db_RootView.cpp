@@ -57,6 +57,11 @@ QWidget *RootView::widget() const
     return const_cast<TreeView *>(&m_view);
 }
 
+const Interface::Holder &RootView::mainView() const
+{
+    return m_mainView;
+}
+
 void RootView::setMainView(const Interface::Holder &mainView)
 {
     ASSERT(mainView.isValid());

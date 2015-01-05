@@ -43,6 +43,8 @@ public:
 
     /* Core::IView */
     virtual QWidget *widget() const;
+
+    virtual const Interface::Holder &mainView() const;
     virtual void setMainView(const Interface::Holder &mainView);
 
     virtual const Interface::Holder &node() const;
