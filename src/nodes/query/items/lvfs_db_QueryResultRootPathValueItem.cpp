@@ -21,6 +21,9 @@
 #include "lvfs_db_QueryResultPathValueItem.h"
 #include "../../../lvfs_db_common.h"
 
+#include <lvfs/Module>
+#include <lvfs/IApplication>
+#include <lvfs/IApplications>
 #include <lvfs-core/models/Qt/SortFilterModel>
 
 
@@ -48,11 +51,19 @@ bool QueryResultRootPathValueItem::isRootPathValue()
 
 void QueryResultRootPathValueItem::open() const
 {
-//    QString error = toUnicode(m_value.value().asString());
-//    IFileContainer::Holder folder(m_container->create(error.mid(0, error.lastIndexOf(QChar(L'/'))), error));
-//
-//    if (folder)
-//        Application::open(folder, info());
+    Interface::Holder apps = Module::desktop().applications(m_file->as<IEntry>()->type());
+
+    if (apps.isValid())
+    {
+        ASSERT(apps->as<IApplications>() != NULL);
+        IApplications::const_iterator iterator = apps->as<IApplications>()->begin();
+
+        if (iterator != apps->as<IApplications>()->end())
+        {
+            ASSERT((*iterator)->as<IApplication>() != NULL);
+            (*iterator)->as<IApplication>()->open(m_file->as<IEntry>());
+        }
+    }
 }
 
 //void QueryResultRootPathValueItem::update(SnapshotItem *item)

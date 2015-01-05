@@ -96,7 +96,7 @@ bool RootView::setNode(const Interface::Holder &node)
     return false;
 }
 
-void RootView::select(const QModelIndex &index)
+void RootView::select(const QModelIndex &index, bool expand)
 {
     QModelIndex toBeSelected = index;
 
@@ -109,6 +109,9 @@ void RootView::select(const QModelIndex &index)
         m_view.scrollTo(toBeSelected, QAbstractItemView::PositionAtCenter);
         m_view.selectionModel()->select(toBeSelected, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Columns);
         m_view.selectionModel()->setCurrentIndex(toBeSelected, QItemSelectionModel::ClearAndSelect);
+
+        if (expand)
+            m_view.expand(toBeSelected);
     }
 }
 
@@ -126,7 +129,7 @@ void RootView::goIntoShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->activated(index, &m_view);
+        Interface::Holder newNode = m_node->as<Db::INode>()->activated(index, Interface::Holder::fromRawData(this));
 
         if (newNode.isValid())
             m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
@@ -154,7 +157,7 @@ void RootView::searchShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->search(index, &m_view);
+        Interface::Holder newNode = m_node->as<Db::INode>()->search(index, Interface::Holder::fromRawData(this));
 
         if (newNode.isValid())
             m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);

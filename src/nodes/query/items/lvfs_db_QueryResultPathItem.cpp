@@ -120,4 +120,9 @@ bool QueryResultPathItem::isPath()
     return true;
 }
 
+bool QueryResultPathItem::isPathProperty()
+{
+    return false;
+}
+
 }}

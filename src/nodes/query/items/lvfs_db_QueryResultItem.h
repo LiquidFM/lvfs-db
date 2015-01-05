@@ -35,6 +35,7 @@ public:
     virtual bool isProperty() = 0;
     virtual bool isValue() = 0;
     virtual bool isPath() = 0;
+    virtual bool isPathProperty() = 0;
     virtual bool isRootPathValue() = 0;
 };
 

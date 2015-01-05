@@ -63,8 +63,8 @@ public: /* Db::INode */
     virtual QModelIndex currentIndex() const;
     virtual void setCurrentIndex(const QModelIndex &index);
 
-    virtual Interface::Holder search(const QModelIndex &index, QWidget *parent);
-    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent);
+    virtual Interface::Holder search(const QModelIndex &file, const Interface::Holder &view);
+    virtual Interface::Holder activated(const QModelIndex &file, const Interface::Holder &view);
 
 protected: /* Core::Tools::TreeModel */
     virtual size_type size() const;

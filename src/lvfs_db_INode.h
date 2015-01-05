@@ -49,8 +49,8 @@ public:
     virtual QModelIndex currentIndex() const = 0;
     virtual void setCurrentIndex(const QModelIndex &index) = 0;
 
-    virtual Interface::Holder search(const QModelIndex &index, QWidget *parent) = 0;
-    virtual Interface::Holder activated(const QModelIndex &index, QWidget *parent) = 0;
+    virtual Interface::Holder search(const QModelIndex &file, const Interface::Holder &view) = 0;
+    virtual Interface::Holder activated(const QModelIndex &file, const Interface::Holder &view) = 0;
 };
 
 }}

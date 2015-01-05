@@ -35,6 +35,11 @@ QueryResultPathPropertyItem::QueryResultPathPropertyItem(const Entity::Property 
     QueryResultPropertyItem(property, parent)
 {}
 
+bool QueryResultPathPropertyItem::isPathProperty()
+{
+    return true;
+}
+
 //void QueryResultPathPropertyItem::add(const IFileContainer *container, const EntityValue &value)
 //{
 //    m_items.push_back(Holder(new QueryResultRootPathValueItem(container, value, this)));

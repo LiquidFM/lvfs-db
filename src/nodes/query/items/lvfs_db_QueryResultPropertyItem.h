@@ -51,6 +51,7 @@ public:
     virtual bool isProperty();
     virtual bool isValue();
     virtual bool isPath();
+    virtual bool isPathProperty();
     virtual bool isRootPathValue();
 
     const Entity::Property &property() const { return m_property; }

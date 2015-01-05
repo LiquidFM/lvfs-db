@@ -57,6 +57,11 @@ bool QueryResultRootItem::isPath()
     return false;
 }
 
+bool QueryResultRootItem::isPathProperty()
+{
+    return false;
+}
+
 bool QueryResultRootItem::isRootPathValue()
 {
     return false;

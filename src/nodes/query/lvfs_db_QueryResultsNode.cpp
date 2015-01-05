@@ -18,7 +18,11 @@
  */
 
 #include "lvfs_db_QueryResultsNode.h"
+
 #include "items/lvfs_db_QueryResultCompositeRootItem.h"
+#include "items/lvfs_db_QueryResultPathItem.h"
+
+#include <lvfs-core/models/Qt/IView>
 
 
 namespace LVFS {
@@ -127,13 +131,29 @@ void QueryResultsNode::setCurrentIndex(const QModelIndex &index)
     m_currentIndex = index;
 }
 
-Interface::Holder QueryResultsNode::search(const QModelIndex &index, QWidget *parent)
+Interface::Holder QueryResultsNode::search(const QModelIndex &file, const Interface::Holder &view)
 {
     return Interface::Holder();
 }
 
-Interface::Holder QueryResultsNode::activated(const QModelIndex &index, QWidget *parent)
+Interface::Holder QueryResultsNode::activated(const QModelIndex &file, const Interface::Holder &view)
 {
+    QueryResultItem *item = static_cast<QueryResultItem *>(file.internalPointer());
+
+    if (item != NULL)
+        if (item->isPath())
+            static_cast<QueryResultPathItem *>(item)->open();
+        else
+            if (item->isRoot() && static_cast<QueryResultRootItem *>(item)->value().entity().type() == Entity::Composite)
+            {
+                for (int i = 0, size = static_cast<QueryResultCompositeRootItem *>(item)->size(); i < size; ++i)
+                    if (static_cast<QueryResultItem *>(static_cast<QueryResultCompositeRootItem *>(item)->at(i))->isPathProperty())
+                    {
+                        view->as<Core::Qt::IView>()->select(index(static_cast<QueryResultCompositeRootItem *>(item)->at(i)), true);
+                        break;
+                    }
+            }
+
     return Interface::Holder();
 }
 

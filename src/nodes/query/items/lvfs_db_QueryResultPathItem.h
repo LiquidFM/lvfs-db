@@ -50,6 +50,7 @@ public:
     virtual bool isProperty();
     virtual bool isValue();
     virtual bool isPath();
+    virtual bool isPathProperty();
 
 //    const IFileInfo::Holder &info() const { return m_info; }
 //    IFileInfo::Holder &info() { return m_info; }
@@ -65,8 +66,6 @@ protected:
 //    Location m_location;
 //    Node *m_node;
     Container m_items;
-
-private:
     Interface::Holder m_file;
 };
 

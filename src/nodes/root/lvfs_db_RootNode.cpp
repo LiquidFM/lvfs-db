@@ -28,6 +28,7 @@
 #include "../../lvfs_db_common.h"
 
 #include <lvfs/IEntry>
+#include <lvfs-core/IView>
 #include <lvfs-core/models/Qt/IView>
 #include <brolly/assert.h>
 
@@ -128,16 +129,16 @@ void RootNode::setCurrentIndex(const QModelIndex &index)
     m_currentIndex = index;
 }
 
-Interface::Holder RootNode::search(const QModelIndex &index, QWidget *parent)
+Interface::Holder RootNode::search(const QModelIndex &file, const Interface::Holder &view)
 {
-    if (static_cast<RootNodeItem *>(index.internalPointer())->isEntity())
+    if (static_cast<RootNodeItem *>(file.internalPointer())->isEntity())
     {
-        RootNodeEntityItem *item = static_cast<RootNodeEntityItem *>(index.internalPointer());
+        RootNodeEntityItem *item = static_cast<RootNodeEntityItem *>(file.internalPointer());
 
         if (item->entity().type() == Entity::Composite)
             if (m_container->transaction())
             {
-                CreateQueryDialog dialog(m_container, item->entity(), parent);
+                CreateQueryDialog dialog(m_container, item->entity(), view->as<Core::IView>()->widget());
 
                 if (dialog.exec() == CreateQueryDialog::Accepted)
                 {
@@ -147,7 +148,7 @@ Interface::Holder RootNode::search(const QModelIndex &index, QWidget *parent)
                         return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
                     else
                     {
-                        QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
                         m_container->rollback();
                     }
                 }
@@ -155,27 +156,27 @@ Interface::Holder RootNode::search(const QModelIndex &index, QWidget *parent)
                     m_container->rollback();
             }
             else
-                QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
     }
 
     return Interface::Holder();
 }
 
-Interface::Holder RootNode::activated(const QModelIndex &index, QWidget *parent)
+Interface::Holder RootNode::activated(const QModelIndex &file, const Interface::Holder &view)
 {
     RootNodeItem *item;
 
-    if ((item = static_cast<RootNodeItem *>(index.internalPointer()))->isEntity())
+    if ((item = static_cast<RootNodeItem *>(file.internalPointer()))->isEntity())
         if (m_container->transaction())
         {
             EntityValueReader reader(m_container->entityValues(static_cast<RootNodeEntityItem *>(item)->entity()));
-            EditableValueListDialog dialog(m_container, reader, parent);
+            EditableValueListDialog dialog(m_container, reader, view->as<Core::IView>()->widget());
 
             if (dialog.exec() == EditableValueListDialog::Accepted)
             {
                 if (!m_container->commit())
                 {
-                    QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
                     m_container->rollback();
                 }
             }
@@ -185,7 +186,7 @@ Interface::Holder RootNode::activated(const QModelIndex &index, QWidget *parent)
             m_container->setListGeometry(static_cast<RootNodeEntityItem *>(item)->entity(), fromQRect(dialog.geometry()));
         }
         else
-            QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
 //    else
 //        if (item->isFiles())
 //        {

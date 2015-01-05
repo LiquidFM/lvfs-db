@@ -32,6 +32,8 @@ class QueryResultPathPropertyItem : public QueryResultPropertyItem
 public:
     QueryResultPathPropertyItem(const Entity::Property &property, Item *parent);
 
+    virtual bool isPathProperty();
+
 //    void add(const IFileContainer *container, const EntityValue &value);
 //    void add(const IFileContainer *container, const EntityValue::List &values);
     void add(EFC::List<Interface::Holder> &files, const Interface::Adaptor<IStorage> &container, const EntityValue::Values &values);
