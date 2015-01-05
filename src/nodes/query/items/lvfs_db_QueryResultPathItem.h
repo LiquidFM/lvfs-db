@@ -21,6 +21,7 @@
 #define LVFS_DB_QUERYRESULTPATHITEM_H_
 
 #include <efc/Vector>
+#include <lvfs-db/IStorage>
 #include "lvfs_db_QueryResultItem.h"
 
 
@@ -34,7 +35,7 @@ public:
 
 public:
 //    QueryResultPathItem(IFileInfo::Holder &info, Item *parent);
-//    QueryResultPathItem(const IFileContainer *container, const QString &fileName, Item *parent);
+    QueryResultPathItem(const Interface::Adaptor<IStorage> &container, const QString &fileName, Item *parent);
     virtual ~QueryResultPathItem();
 
     /* Core::Tools::TreeModel::Item */
@@ -64,6 +65,9 @@ protected:
 //    Location m_location;
 //    Node *m_node;
     Container m_items;
+
+private:
+    Interface::Holder m_file;
 };
 
 }}

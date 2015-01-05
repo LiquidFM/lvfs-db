@@ -20,6 +20,7 @@
 #ifndef LVFS_DB_QUERYRESULTROOTPATHVALUEITEM_H_
 #define LVFS_DB_QUERYRESULTROOTPATHVALUEITEM_H_
 
+#include <lvfs-db/IStorage>
 #include <liquiddb/EntityValue>
 #include <QtCore/QCoreApplication>
 #include "lvfs_db_QueryResultPathItem.h"
@@ -36,7 +37,7 @@ class QueryResultRootPathValueItem : public QueryResultPathItem
     Q_DECLARE_TR_FUNCTIONS(QueryResultPathValueItem)
 
 public:
-//    QueryResultRootPathValueItem(const IFileContainer *container, const EntityValue &value, Item *parent);
+    QueryResultRootPathValueItem(const Interface::Adaptor<IStorage> &container, const EntityValue &value, Item *parent);
 
     /* QueryResultItem */
     virtual bool isRootPathValue();
@@ -49,7 +50,7 @@ public:
 
 private:
     EntityValue m_value;
-//    const IFileContainer *m_container;
+    const Interface::Adaptor<IStorage> &m_container;
 //    IFileContainer::Holder m_thisContainer;
 };
 

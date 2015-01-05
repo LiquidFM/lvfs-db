@@ -18,7 +18,12 @@
  */
 
 #include "lvfs_db_QueryResultPathItem.h"
-//#include "../../../interfaces/idm_invalidfileinfo.h"
+#include "../lvfs_db_InvalidFile.h"
+#include "../../../lvfs_db_common.h"
+
+#include <lvfs/IEntry>
+#include <lvfs/IDirectory>
+#include <QtGui/QIcon>
 
 
 namespace LVFS {
@@ -30,13 +35,17 @@ namespace Db {
 //    m_location(m_info->fileName()),
 //    m_node(NULL)
 //{}
-//
-//QueryResultPathItem::QueryResultPathItem(const IFileContainer *container, const QString &fileName, Item *parent) :
-//    QueryResultItem(parent),
+
+QueryResultPathItem::QueryResultPathItem(const Interface::Adaptor<IStorage> &container, const QString &fileName, Item *parent) :
+    QueryResultItem(parent),
+    m_file(container.interface()->as<IDirectory>()->entry(fromUnicode(fileName)))
 //    m_info(new InvalidInfo(fileName)),
 //    m_location(m_info->fileName()),
 //    m_node(NULL)
-//{}
+{
+    if (!m_file.isValid())
+        m_file.reset(new (std::nothrow) InvalidFile(fromUnicode(fileName)));
+}
 
 QueryResultPathItem::~QueryResultPathItem()
 {
@@ -65,24 +74,28 @@ QueryResultPathItem::size_type QueryResultPathItem::indexOf(Item *item) const
 
 QVariant QueryResultPathItem::data(qint32 column, qint32 role) const
 {
-//    switch (role)
-//    {
-//        case Qt::EditRole:
-//        case Qt::DisplayRole:
-//            return m_info->fileName().as<QString>();
-//        case Qt::DecorationRole:
+    switch (role)
+    {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return toUnicode(m_file->as<IEntry>()->title());
+        case Qt::DecorationRole:
 //            if (isLocked())
 //                return lockIcon();
 //            else
-//                return m_info->fileType()->icon();
-//        case Qt::TextAlignmentRole:
-//            return Qt::AlignLeft;
-//        case Qt::ToolTipRole:
+        {
+            QIcon icon;
+            icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+            return icon;
+        }
+        case Qt::TextAlignmentRole:
+            return Qt::AlignLeft;
+        case Qt::ToolTipRole:
 //            if (isLocked())
 //                return lockReason();
 //            else
-//                break;
-//    }
+                break;
+    }
 
     return QVariant();
 }

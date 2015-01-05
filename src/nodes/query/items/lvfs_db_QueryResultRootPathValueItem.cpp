@@ -33,13 +33,13 @@ namespace Db {
 //}
 
 
-//QueryResultRootPathValueItem::QueryResultRootPathValueItem(const IFileContainer *container, const EntityValue &value, Item *parent) :
-//    QueryResultPathItem(container, toUnicode(value.value().asString()), parent),
-//    m_value(value),
-//    m_container(container)
-//{
+QueryResultRootPathValueItem::QueryResultRootPathValueItem(const Interface::Adaptor<IStorage> &container, const EntityValue &value, Item *parent) :
+    QueryResultPathItem(container, toUnicode(value.value().asString()), parent),
+    m_value(value),
+    m_container(container)
+{
 //    lock(tr("Updating..."));
-//}
+}
 
 bool QueryResultRootPathValueItem::isRootPathValue()
 {

@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,26 +17,32 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_QUERYRESULTPATHPROPERTYITEM_H_
-#define LVFS_DB_QUERYRESULTPATHPROPERTYITEM_H_
+#ifndef WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_
+#define WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_
 
-#include <lvfs-db/IStorage>
-#include "lvfs_db_QueryResultPropertyItem.h"
+#include <lvfs/IEntry>
 
 
 namespace LVFS {
 namespace Db {
 
-class QueryResultPathPropertyItem : public QueryResultPropertyItem
+class PLATFORM_MAKE_PRIVATE InvalidFile : public Implements<IEntry>
 {
 public:
-    QueryResultPathPropertyItem(const Entity::Property &property, Item *parent);
+    InvalidFile(const char *file);
+    virtual ~InvalidFile();
 
-//    void add(const IFileContainer *container, const EntityValue &value);
-//    void add(const IFileContainer *container, const EntityValue::List &values);
-    void add(EFC::List<Interface::Holder> &files, const Interface::Adaptor<IStorage> &container, const EntityValue::Values &values);
+public: /* IEntry */
+    virtual const char *title() const;
+    virtual const char *schema() const;
+    virtual const char *location() const;
+    virtual const IType *type() const;
+
+private:
+    char *m_title;
+    Interface::Holder m_type;
 };
 
 }}
 
-#endif /* LVFS_DB_QUERYRESULTPATHPROPERTYITEM_H_ */
+#endif /* WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_ */

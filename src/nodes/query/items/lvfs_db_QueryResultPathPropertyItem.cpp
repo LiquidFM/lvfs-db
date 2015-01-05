@@ -48,18 +48,18 @@ QueryResultPathPropertyItem::QueryResultPathPropertyItem(const Entity::Property 
 //
 //    qSort(m_items.begin(), m_items.end(), lessThan);
 //}
-//
-//void QueryResultPathPropertyItem::add(Snapshot::Files &files, const IFileContainer *container, const EntityValue::Values &values)
-//{
-//    Holder item;
-//
-//    for (auto i : values)
-//    {
-//        m_items.push_back(item = new QueryResultRootPathValueItem(container, i.second, this));
+
+void QueryResultPathPropertyItem::add(EFC::List<Interface::Holder> &files, const Interface::Adaptor<IStorage> &container, const EntityValue::Values &values)
+{
+    QueryResultRootPathValueItem *item;
+
+    for (auto i : values)
+    {
+        m_items.push_back(item = new QueryResultRootPathValueItem(container, i.second, this));
 //        files.add(item.as<QueryResultRootPathValueItem>()->location(), item);
-//    }
-//
+    }
+
 //    qSort(m_items.begin(), m_items.end(), lessThan);
-//}
+}
 
 }}

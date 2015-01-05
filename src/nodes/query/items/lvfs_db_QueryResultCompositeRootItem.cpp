@@ -34,12 +34,12 @@ QueryResultCompositeRootItem::QueryResultCompositeRootItem(EFC::List<Interface::
 
     for (auto i : value.entity().properties())
     {
-//        if (container->schema(i.second.entity) == IStorage::Path)
-//        {
-//            item = new QueryResultPathPropertyItem(i.second, this);
-//            item.as<QueryResultPathPropertyItem>()->add(files, container.container(), CompositeEntityValue(value).values(i.second.entity));
-//        }
-//        else
+        if (container->schema(i.second.entity) == IStorage::Path)
+        {
+            item = new QueryResultPathPropertyItem(i.second, this);
+            static_cast<QueryResultPathPropertyItem *>(item)->add(files, container, CompositeEntityValue(value).values(i.second.entity));
+        }
+        else
         {
             item = new QueryResultPropertyItem(i.second, this);
             item->add(CompositeEntityValue(value).values(i.second.entity));
