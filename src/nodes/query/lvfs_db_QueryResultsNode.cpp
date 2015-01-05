@@ -42,7 +42,10 @@ QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &container
 }
 
 QueryResultsNode::~QueryResultsNode()
-{}
+{
+    for (auto i : m_items)
+        delete i;
+}
 
 void QueryResultsNode::refresh(int depth)
 {
