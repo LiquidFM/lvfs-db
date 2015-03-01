@@ -37,6 +37,7 @@ public: /* IEntry */
     virtual const char *schema() const;
     virtual const char *location() const;
     virtual const IType *type() const;
+    virtual Interface::Holder open(IFile::Mode mode) const;
 
 private:
     char *m_title;

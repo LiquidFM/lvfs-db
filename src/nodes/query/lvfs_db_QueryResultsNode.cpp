@@ -62,10 +62,33 @@ void QueryResultsNode::closed(const Interface::Holder &view)
 
 }
 
+void QueryResultsNode::accept(const Interface::Holder &view, Files &files)
+{
+    files.clear();
+}
+
+void QueryResultsNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)
+{
+    ASSERT(!"Should not be reached!");
+}
+
+void QueryResultsNode::remove(const Interface::Holder &view, Files &files)
+{
+
+}
+
 void QueryResultsNode::clear()
 {
 
 }
+
+Interface::Holder QueryResultsNode::node(const Interface::Holder &file) const
+{
+    return Interface::Holder();
+}
+
+void QueryResultsNode::setNode(const Interface::Holder &file, const Interface::Holder &node)
+{}
 
 void QueryResultsNode::fetchMore(const QModelIndex &parent)
 {
@@ -178,13 +201,5 @@ QueryResultsNode::size_type QueryResultsNode::indexOf(Item *item) const
 
     return InvalidIndex;
 }
-
-Interface::Holder QueryResultsNode::node(const Interface::Holder &file) const
-{
-    return Interface::Holder();
-}
-
-void QueryResultsNode::setNode(const Interface::Holder &file, const Interface::Holder &node)
-{}
 
 }}

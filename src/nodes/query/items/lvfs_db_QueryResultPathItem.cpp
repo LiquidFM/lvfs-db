@@ -38,7 +38,7 @@ namespace Db {
 
 QueryResultPathItem::QueryResultPathItem(const Interface::Adaptor<IStorage> &container, const QString &fileName, Item *parent) :
     QueryResultItem(parent),
-    m_file(container.interface()->as<IDirectory>()->entry(fromUnicode(fileName)))
+    m_file(container.interface()->as<IDirectory>()->entry(fromUnicode(fileName), NULL))
 //    m_info(new InvalidInfo(fileName)),
 //    m_location(m_info->fileName()),
 //    m_node(NULL)

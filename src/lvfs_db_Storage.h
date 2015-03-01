@@ -21,7 +21,6 @@
 #define LVFS_DB_STORAGE_H_
 
 #include <lvfs/IEntry>
-#include <lvfs/IFsFile>
 #include <lvfs/IDirectory>
 #include <lvfs-db/IStorage>
 #include <lvfs-core/INodeFactory>
@@ -43,6 +42,7 @@ public:
     /* IStorage */
     virtual bool isDbValid() const;
     virtual const char *lastError() const;
+    virtual Interface::Holder file() const;
     virtual const LiquidDb::Storage::Entities &entities() const;
 
     virtual bool transaction();

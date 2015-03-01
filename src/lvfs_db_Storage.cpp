@@ -44,6 +44,11 @@ const char *Storage::lastError() const
     return "";
 }
 
+Interface::Holder Storage::file() const
+{
+    return original();
+}
+
 const LiquidDb::Storage::Entities &Storage::entities() const
 {
     return m_storage.entities();

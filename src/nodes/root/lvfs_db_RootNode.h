@@ -48,8 +48,14 @@ public: /* Core::INode */
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
+    virtual void accept(const Interface::Holder &view, Files &files);
+    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move = false);
+    virtual void remove(const Interface::Holder &view, Files &files);
 
     virtual void clear();
+
+    virtual Interface::Holder node(const Interface::Holder &file) const;
+    virtual void setNode(const Interface::Holder &file, const Interface::Holder &node);
 
 public: /* Core::Tools::TreeModel */
     virtual Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -65,10 +71,6 @@ public: /* Db::INode */
 
     virtual Interface::Holder search(const QModelIndex &file, const Interface::Holder &view);
     virtual Interface::Holder activated(const QModelIndex &file, const Interface::Holder &view);
-
-protected: /* Core::INode */
-    virtual Interface::Holder node(const Interface::Holder &file) const;
-    virtual void setNode(const Interface::Holder &file, const Interface::Holder &node);
 
 protected: /* Core::Tools::TreeModel */
     virtual size_type size() const;

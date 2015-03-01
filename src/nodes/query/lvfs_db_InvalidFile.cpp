@@ -58,4 +58,9 @@ const IType *InvalidFile::type() const
     return m_type->as<IType>();
 }
 
+Interface::Holder InvalidFile::open(IFile::Mode mode) const
+{
+    return Interface::Holder();
+}
+
 }}

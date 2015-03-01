@@ -22,13 +22,17 @@
 #include "items/lvfs_db_RootNodePropertyItem.h"
 #include "items/lvfs_db_RootNodeEntityItem.h"
 #include "items/lvfs_db_RootNodeFilesItem.h"
+
 #include "../query/lvfs_db_QueryResultsNode.h"
+#include "../filesystem/lvfs_db_FileSystemDirectory.h"
+
 #include "../../gui/value/list/editable/lvfs_db_EditableValueListDialog.h"
 #include "../../gui/query/create/lvfs_db_CreateQueryDialog.h"
 #include "../../lvfs_db_common.h"
 
 #include <lvfs/IEntry>
 #include <lvfs-core/IView>
+#include <lvfs-core/INodeFactory>
 #include <lvfs-core/models/Qt/IView>
 #include <brolly/assert.h>
 
@@ -39,7 +43,7 @@ namespace LVFS {
 namespace Db {
 
 RootNode::RootNode(const Interface::Holder &container, const Interface::Holder &parent) :
-    Complements<Core::Node, Db::INode>(container, parent),
+    Complements(container, parent),
     m_container(container),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
@@ -55,12 +59,17 @@ RootNode::~RootNode()
 void RootNode::refresh(int depth)
 {
     if (m_items.empty())
+    {
+        beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+        m_items.push_back(new RootNodeFilesItem());
+        endInsertRows();
+
         for (auto i : m_container->entities())
             doAdd(i.second);
+    }
 
-    if (!m_items.empty())
-        for (auto i : m_views)
-            i->as<Core::Qt::IView>()->select(currentIndex());
+    for (auto i : m_views)
+        i->as<Core::Qt::IView>()->select(currentIndex());
 }
 
 void RootNode::opened(const Interface::Holder &view)
@@ -73,18 +82,47 @@ void RootNode::closed(const Interface::Holder &view)
     m_views.erase(view);
 }
 
+void RootNode::accept(const Interface::Holder &view, Files &files)
+{
+    files.clear();
+}
+
+void RootNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)
+{
+    ASSERT(!"Should not be reached!");
+}
+
+void RootNode::remove(const Interface::Holder &view, Files &files)
+{
+
+}
+
 void RootNode::clear()
 {
     if (!m_items.empty())
     {
+        struct LocalDeleter
+        {
+            inline EFC::Vector<Item *>::iterator operator()(EFC::Vector<Item *> &container, EFC::Vector<Item *>::iterator &iterator) const
+            { delete (*iterator); return container.erase(iterator); }
+        };
+
+        struct LocalAdaptor
+        {
+            inline const Interface::Holder &operator()(EFC::Vector<Item *>::iterator &iterator) const
+            {
+                if (static_cast<RootNodeItem *>(*iterator)->isFiles())
+                    return static_cast<RootNodeFilesItem *>(*iterator)->node();
+
+                return node;
+            }
+
+            Interface::Holder node;
+        };
+
         beginRemoveRows(QModelIndex(), 0, m_items.size() - 1);
-
-        for (auto &i : m_items)
-            delete i;
-
-        m_items.clear();
+        Core::INode::clear(m_items, LocalAdaptor(), LocalDeleter());
         m_entities.clear();
-
         endRemoveRows();
     }
 }
@@ -187,18 +225,19 @@ Interface::Holder RootNode::activated(const QModelIndex &file, const Interface::
         }
         else
             QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
-//    else
-//        if (item->isFiles())
-//        {
-//            if (static_cast<RootNodeFilesItem *>(item)->node() == NULL)
-//            {
-//                IFileContainer::Holder folder(m_container->container()->open());
-//                Node *node = new FolderNode(folder, m_container, this);
-//                static_cast<RootNodeFilesItem *>(item)->setNode(node);
-//            }
-//
-//            return static_cast<RootNodeFilesItem *>(item)->node();
-//        }
+    else
+        if (item->isFiles())
+        {
+            if (!static_cast<RootNodeFilesItem *>(item)->node().isValid())
+            {
+                Interface::Holder file(new (std::nothrow) FileSystemDirectory(m_container, m_container->file()));
+
+                if (LIKELY(file.isValid()))
+                    static_cast<RootNodeFilesItem *>(item)->setNode(file->as<Core::INodeFactory>()->createNode(file, Interface::Holder::fromRawData(this)));
+            }
+
+            return static_cast<RootNodeFilesItem *>(item)->node();
+        }
 
     return Interface::Holder();
 }

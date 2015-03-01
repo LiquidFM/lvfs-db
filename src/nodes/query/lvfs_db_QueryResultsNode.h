@@ -51,8 +51,14 @@ public: /* Core::INode */
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
+    virtual void accept(const Interface::Holder &view, Files &files);
+    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move = false);
+    virtual void remove(const Interface::Holder &view, Files &files);
 
     virtual void clear();
+
+    virtual Interface::Holder node(const Interface::Holder &file) const;
+    virtual void setNode(const Interface::Holder &file, const Interface::Holder &node);
 
 public: /* Db::INode */
     virtual QAbstractItemModel *model() const;
@@ -70,10 +76,6 @@ protected: /* Core::Tools::TreeModel */
     virtual size_type size() const;
     virtual Item *at(size_type index) const;
     virtual size_type indexOf(Item *item) const;
-
-protected: /* Core::INode */
-    virtual Interface::Holder node(const Interface::Holder &file) const;
-    virtual void setNode(const Interface::Holder &file, const Interface::Holder &node);
 
 private:
     enum { PrefetchLimit = 64 };

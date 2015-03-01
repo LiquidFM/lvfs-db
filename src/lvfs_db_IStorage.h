@@ -71,6 +71,7 @@ public:
 
     virtual bool isDbValid() const = 0;
     virtual const char *lastError() const = 0;
+    virtual Interface::Holder file() const = 0;
     virtual const LiquidDb::Storage::Entities &entities() const = 0;
 
     virtual bool transaction() = 0;

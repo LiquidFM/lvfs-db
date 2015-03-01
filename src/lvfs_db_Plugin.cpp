@@ -24,6 +24,20 @@
 #include <brolly/assert.h>
 
 
+namespace {
+using namespace LVFS;
+
+class Type : public IType
+{
+public:
+    virtual const char *name() const { return "application/octet-stream"; }
+    virtual Interface::Holder icon() const { return Interface::Holder(); }
+    virtual const char *description() const { return "SQLite 3.x database"; }
+};
+
+}
+
+
 namespace LVFS {
 namespace Db {
 
@@ -35,9 +49,11 @@ Plugin::~Plugin()
 
 Interface::Holder Plugin::open(const Interface::Holder &file) const
 {
+    static const Type type;
+
     IDirectory *directory = file->as<IDirectory>();
     ASSERT(directory != NULL);
-    Interface::Holder entry = directory->entry(".storage.idm");
+    Interface::Holder entry = directory->entry(".storage.idm", &type);
 
     if (entry.isValid())
     {
