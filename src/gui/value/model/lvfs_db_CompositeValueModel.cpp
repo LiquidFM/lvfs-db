@@ -25,6 +25,11 @@
 #include "items/lvfs_db_CompositeValuePossibleFileItem.h"
 #include "items/lvfs_db_CompositeValuePossibleDirItem.h"
 
+#include <lvfs/IEntry>
+#include <lvfs/Module>
+
+#include <cstring>
+
 
 namespace LVFS {
 namespace Db {
@@ -50,27 +55,26 @@ CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interfa
 CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, const Files &files, QObject *parent) :
     Model(parent)
 {
-//    const SnapshotItem *file;
-//    CompositeValuePropertyItem *item;
-//
-//    for (auto i : value.entity().properties())
-//    {
-//        m_items.push_back(item = new CompositeValuePropertyItem(i.second));
-//        const EntityValue::Values &list = CompositeEntityValue(value).values(i.second.entity);
-//
-//        for (auto i : list)
-//            if (container->schema(i.second.entity()) == Interface::Adaptor<IStorage>::Path)
-//            {
-//                file = files.value(i.first);
-//
-//                if (file->info()->isFile())
-//                    item->add(new CompositeValuePossibleFileItem(i.second, file, item));
-//                else
-//                    item->add(new CompositeValuePossibleDirItem(i.second, file, item));
-//            }
-//            else
-//                item->add(new CompositeValueValueItem(i.second, item));
-//    }
+    CompositeValuePropertyItem *item;
+
+    for (auto i : value.entity().properties())
+    {
+        m_items.push_back(item = new CompositeValuePropertyItem(i.second));
+        const EntityValue::Values &list = CompositeEntityValue(value).values(i.second.entity);
+
+        for (auto i : list)
+            if (container->schema(i.second.entity()) == IStorage::Path)
+            {
+                const Interface::Holder &file = files.value(i.first);
+
+                if (::strcmp(file->as<IEntry>()->type()->name(), Module::DirectoryTypeName) != 0)
+                    item->add(new CompositeValuePossibleFileItem(i.second, file, item));
+                else
+                    item->add(new CompositeValuePossibleDirItem(i.second, file, item));
+            }
+            else
+                item->add(new CompositeValueValueItem(i.second, item));
+    }
 }
 
 ::Qt::ItemFlags CompositeValueModel::flags(const QModelIndex &index) const

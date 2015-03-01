@@ -18,6 +18,9 @@
  */
 
 #include "lvfs_db_CompositeValuePossibleFileItem.h"
+#include "../../../../lvfs_db_common.h"
+
+#include <lvfs/IEntry>
 
 
 namespace LVFS {
@@ -25,30 +28,35 @@ namespace Db {
 
 CompositeValuePossibleFileItem::CompositeValuePossibleFileItem(const EntityValue &value, const Interface::Holder &source, Model::Item *parent) :
     CompositeValuePathItem(value, parent),
-    m_source(source)
-{}
+    m_source(source),
+    m_name(toUnicode(m_source->as<IEntry>()->title())),
+    m_toolTip(toUnicode(m_source->as<IEntry>()->type()->name())),
+    m_icon()
+{
+    m_icon.addFile(toUnicode(m_source->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+}
 
 QVariant CompositeValuePossibleFileItem::data(qint32 column, qint32 role) const
 {
-//    switch (role)
-//    {
-//        case Qt::EditRole:
-//        case Qt::DisplayRole:
-//            return toQVariant(m_value.value());
-//        case Qt::DecorationRole:
-//            return m_source->info()->fileType()->icon();
-//        case Qt::TextAlignmentRole:
-//            return Qt::AlignLeft;
-//        case Qt::ToolTipRole:
-//            return m_source->info()->fileType()->name();
-//    }
+    switch (role)
+    {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return m_name;
+        case Qt::DecorationRole:
+            return m_icon;
+        case Qt::TextAlignmentRole:
+            return Qt::AlignLeft;
+        case Qt::ToolTipRole:
+            return m_toolTip;
+    }
 
     return QVariant();
 }
 
 QString CompositeValuePossibleFileItem::fileName() const
 {
-    return QString(); //m_source->info()->fileName();
+    return m_name;
 }
 
 bool CompositeValuePossibleFileItem::isFile() const

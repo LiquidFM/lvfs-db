@@ -19,70 +19,17 @@
 
 #include "lvfs_db_CompositeValuePossibleDirItem.h"
 #include "lvfs_db_CompositeValuePossibleFileItem.h"
+#include "../../../../lvfs_db_common.h"
 
+#include <lvfs/IEntry>
+#include <lvfs/Module>
+#include <lvfs/IDirectory>
 #include <lvfs-core/models/Qt/SortFilterModel>
 
+#include <cstring>
 
 namespace LVFS {
 namespace Db {
-
-class CompositeValueFakePossibleDirItem : public CompositeValuePossibleDirItem
-{
-public:
-    typedef QList<Model::Item *> Container;
-
-public:
-    CompositeValueFakePossibleDirItem(const Interface::Holder &source, Model::Item *parent = 0) :
-        CompositeValuePossibleDirItem(EntityValue(), source, parent)
-    {}
-
-    /* Base */
-    virtual QVariant data(qint32 column, qint32 role) const
-    {
-//        switch (role)
-//        {
-//            case Qt::EditRole:
-//            case Qt::DisplayRole:
-//                return source()->info()->fileName().as<QString>();
-//            case Qt::DecorationRole:
-//                return source()->info()->fileType()->icon();
-//            case Qt::TextAlignmentRole:
-//                return Qt::AlignLeft;
-//            case Qt::ToolTipRole:
-//                return source()->info()->fileType()->name();
-//        }
-
-        return QVariant();
-    }
-};
-
-
-class CompositeValueFakePossibleFileItem : public CompositeValuePossibleFileItem
-{
-public:
-    CompositeValueFakePossibleFileItem(const Interface::Holder &source, Model::Item *parent = 0) :
-        CompositeValuePossibleFileItem(EntityValue(), source, parent)
-    {}
-
-    /* Base */
-    virtual QVariant data(qint32 column, qint32 role) const
-    {
-//        switch (role)
-//        {
-//            case Qt::EditRole:
-//            case Qt::DisplayRole:
-//                return source()->info()->fileName().as<QString>();
-//            case Qt::DecorationRole:
-//                return source()->info()->fileType()->icon();
-//            case Qt::TextAlignmentRole:
-//                return Qt::AlignLeft;
-//            case Qt::ToolTipRole:
-//                return source()->info()->fileType()->name();
-//        }
-
-        return QVariant();
-    }
-};
 
 static bool lessThan(CompositeValuePossibleDirItem::Container::value_type v1, CompositeValuePossibleDirItem::Container::value_type v2)
 {
@@ -90,31 +37,34 @@ static bool lessThan(CompositeValuePossibleDirItem::Container::value_type v1, Co
         if (static_cast<CompositeValuePathItem *>(v2)->isFile())
             return Core::Qt::SortFilterModel::compareFileNames(static_cast<CompositeValuePathItem *>(v1)->fileName(), static_cast<CompositeValuePathItem *>(v2)->fileName());
         else
-            return true;
+            return false;
     else
         if (static_cast<CompositeValuePathItem *>(v2)->isFile())
-            return false;
+            return true;
         else
             return Core::Qt::SortFilterModel::compareFileNames(static_cast<CompositeValuePathItem *>(v1)->fileName(), static_cast<CompositeValuePathItem *>(v2)->fileName());
 }
 
 CompositeValuePossibleDirItem::CompositeValuePossibleDirItem(const EntityValue &value, const Interface::Holder &source, Model::Item *parent) :
     CompositeValuePathItem(value, parent),
-    m_source(source)
+    m_source(source),
+    m_name(toUnicode(source->as<IEntry>()->title())),
+    m_toolTip(toUnicode(source->as<IEntry>()->type()->name())),
+    m_icon()
 {
-//    const Interface::Holder &file;
-//
-//    for (SnapshotItem::const_iterator i = source->begin(), end = source->end(); i != end; ++i)
-//    {
-//        file = (*i);
-//
-//        if (file->info()->isFile())
-//            add(new CompositeValueFakePossibleFileItem(file, this));
-//        else
-//            add(new CompositeValueFakePossibleDirItem(file, this));
-//    }
-//
-//    qSort(m_items.begin(), m_items.end(), lessThan);
+    m_icon.addFile(toUnicode(source->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+
+    for (auto i = m_source->as<IDirectory>()->begin(), end = m_source->as<IDirectory>()->end(); i != end; ++i)
+    {
+        const Interface::Holder &file = (*i);
+
+        if (::strcmp(file->as<IEntry>()->type()->name(), Module::DirectoryTypeName) != 0)
+            add(new CompositeValuePossibleFileItem(EntityValue(), file, this));
+        else
+            add(new CompositeValuePossibleDirItem(EntityValue(), file, this));
+    }
+
+    qSort(m_items.begin(), m_items.end(), lessThan);
 }
 
 CompositeValuePossibleDirItem::~CompositeValuePossibleDirItem()
@@ -139,25 +89,25 @@ CompositeValuePossibleDirItem::size_type CompositeValuePossibleDirItem::indexOf(
 
 QVariant CompositeValuePossibleDirItem::data(qint32 column, qint32 role) const
 {
-//    switch (role)
-//    {
-//        case Qt::EditRole:
-//        case Qt::DisplayRole:
-//            return toQVariant(m_value.value());
-//        case Qt::DecorationRole:
-//            return m_source->info()->fileType()->icon();
-//        case Qt::TextAlignmentRole:
-//            return Qt::AlignLeft;
-//        case Qt::ToolTipRole:
-//            return m_source->info()->fileType()->name();
-//    }
+    switch (role)
+    {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return m_name;
+        case Qt::DecorationRole:
+            return m_icon;
+        case Qt::TextAlignmentRole:
+            return Qt::AlignLeft;
+        case Qt::ToolTipRole:
+            return m_toolTip;
+    }
 
     return QVariant();
 }
 
 QString CompositeValuePossibleDirItem::fileName() const
 {
-    return QString(); //m_source->info()->fileName();
+    return m_name;
 }
 
 bool CompositeValuePossibleDirItem::isFile() const

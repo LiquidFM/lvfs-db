@@ -20,6 +20,7 @@
 #ifndef LVFS_DB_COMPOSITEVALUEPOSSIBLEFILEITEM_H_
 #define LVFS_DB_COMPOSITEVALUEPOSSIBLEFILEITEM_H_
 
+#include <QtGui/QIcon>
 #include "lvfs_db_CompositeValuePathItem.h"
 
 
@@ -44,6 +45,9 @@ protected:
 
 private:
     Interface::Holder m_source;
+    QString m_name;
+    QString m_toolTip;
+    QIcon m_icon;
 };
 
 }}
