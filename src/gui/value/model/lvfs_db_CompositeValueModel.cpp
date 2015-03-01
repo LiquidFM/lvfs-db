@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +47,9 @@ CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interfa
     }
 }
 
-//CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, const Files &files, QObject *parent) :
-//    Model(parent)
-//{
+CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, const Files &files, QObject *parent) :
+    Model(parent)
+{
 //    const SnapshotItem *file;
 //    CompositeValuePropertyItem *item;
 //
@@ -71,7 +71,7 @@ CompositeValueModel::CompositeValueModel(const EntityValue &value, const Interfa
 //            else
 //                item->add(new CompositeValueValueItem(i.second, item));
 //    }
-//}
+}
 
 ::Qt::ItemFlags CompositeValueModel::flags(const QModelIndex &index) const
 {

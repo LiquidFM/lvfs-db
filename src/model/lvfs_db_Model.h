@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,14 @@
 #define LVFS_DB_MODEL_H_
 
 #include <efc/Vector>
+#include <platform/utils.h>
 #include <lvfs-core/tools/models/TreeModel>
 
 
 namespace LVFS {
 namespace Db {
 
-class Model : public Core::Tools::TreeModel
+class PLATFORM_MAKE_PRIVATE Model : public Core::Tools::TreeModel
 {
 public:
     class ListItem : public Item

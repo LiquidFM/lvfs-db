@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@
 #include "../../composite/lvfs_db_CompositeValueDialog.h"
 
 
-class NewCompositeValueDialog : public CompositeValueDialog
+class PLATFORM_MAKE_PRIVATE NewCompositeValueDialog : public CompositeValueDialog
 {
     Q_OBJECT
 
 public:
     NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent = 0);
-//    NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent = 0);
+    NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent = 0);
 };
 
 #endif /* LVFS_DB_NEWCOMPOSITEVALUEDIALOG_H_ */

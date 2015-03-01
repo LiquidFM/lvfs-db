@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStora
     setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
 }
 
-//NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
-//    CompositeValueDialog(container, value, files, parent)
-//{
-//    setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
-//}
+NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
+    CompositeValueDialog(container, value, files, parent)
+{
+    setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
+}

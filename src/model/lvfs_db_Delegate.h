@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,14 @@
 #ifndef LVFS_DB_DELEGATE_H_
 #define LVFS_DB_DELEGATE_H_
 
+#include <platform/utils.h>
 #include <QtGui/QStyledItemDelegate>
 
 
 namespace LVFS {
 namespace Db {
 
-class Delegate : public QStyledItemDelegate
+class PLATFORM_MAKE_PRIVATE Delegate : public QStyledItemDelegate
 {
     Q_DISABLE_COPY(Delegate)
 

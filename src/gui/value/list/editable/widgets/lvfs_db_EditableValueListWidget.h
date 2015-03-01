@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ using namespace ::LVFS;
 using namespace ::LVFS::Db;
 using namespace ::LVFS::Tools;
 
-class EditableValueListWidgetPrivate : public QWidget
+class PLATFORM_MAKE_PRIVATE EditableValueListWidgetPrivate : public QWidget
 {
     Q_OBJECT
 
@@ -123,7 +123,7 @@ private:
 };
 
 
-class MainEditableValueListWidget : public BaseNestedWidget, public EditableValueListWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE MainEditableValueListWidget : public BaseNestedWidget, public EditableValueListWidgetPrivate::ICallback
 {
 public:
     MainEditableValueListWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);
@@ -159,7 +159,7 @@ private:
 };
 
 
-class EditableValueListWidget : public NestedWidget, public EditableValueListWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE EditableValueListWidget : public NestedWidget, public EditableValueListWidgetPrivate::ICallback
 {
 public:
     EditableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);

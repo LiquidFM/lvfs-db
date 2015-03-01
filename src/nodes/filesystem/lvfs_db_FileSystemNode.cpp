@@ -18,6 +18,17 @@
  */
 
 #include "lvfs_db_FileSystemNode.h"
+#include "../../gui/choose/lvfs_db_ChooseEntityDialog.h"
+#include "../../gui/value/model/lvfs_db_CompositeValueModel.h"
+#include "../../gui/value/new/file/lvfs_db_NewFileValueDialog.h"
+#include "../../lvfs_db_common.h"
+
+#include <lvfs/Module>
+#include <lvfs/IEntry>
+#include <lvfs-core/IView>
+#include <QtGui/QMessageBox>
+
+#include <cstdio>
 
 
 namespace LVFS {
@@ -59,7 +70,101 @@ void FileSystemNode::closed(const Interface::Holder &view)
 
 void FileSystemNode::accept(const Interface::Holder &view, Files &files)
 {
+    using namespace LiquidDb;
     m_node->accept(view, files);
+
+    if (!files.empty() && m_storage->transaction())
+    {
+        Entity entity(ChooseEntityDialog::chooseFile(m_storage, view->as<Core::IView>()->widget()));
+
+        if (entity.isValid())
+        {
+            EntityValue value(m_storage->addValue(entity));
+
+            if (value.isValid())
+            {
+                Entity path;
+                CompositeValueModel::Files possibleFiles;
+                CompositeValueModel::ValueList list;
+                char buffer[Module::MaxUriLength];
+                char prefix[Module::MaxUriLength];
+
+                if (::strcmp(file()->as<IEntry>()->location(), m_storage->file()->as<IEntry>()->location()) == 0)
+                    prefix[0] = 0;
+                else
+                {
+                    if (UNLIKELY(std::snprintf(prefix, sizeof(prefix), "%s/", file()->as<IEntry>()->location() + ::strlen(m_storage->file()->as<IEntry>()->location()) + 1) < 0))
+                    {
+                        m_storage->rollback();
+                        files.clear();
+                        return;
+                    }
+                }
+
+                for (auto &i : entity.properties())
+                    if (m_storage->schema(path = i.second.entity) == IStorage::Path)
+                    {
+                        EntityValue localValue;
+
+                        for (auto i = files.begin(), end = files.end(); i != end; ++i)
+                        {
+                            if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, (*i)->as<IEntry>()->title()) < 0))
+                            {
+                                m_storage->rollback();
+                                files.clear();
+                                return;
+                            }
+
+                            localValue = m_storage->addValue(path, buffer);
+
+                            if (localValue.isValid())
+                            {
+                                list.push_back(localValue);
+                                possibleFiles[localValue.id()] = (*i);
+                            }
+                            else
+                            {
+                                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                                m_storage->rollback();
+                                files.clear();
+                                return;
+                            }
+                        }
+
+                        break;
+                    }
+
+                if (m_storage->addValue(value, list))
+                {
+                    NewFileValueDialog dialog(m_storage, value, possibleFiles, view->as<Core::IView>()->widget());
+
+                    if (dialog.exec() != NewFileValueDialog::Accepted)
+                        m_storage->rollback();
+                    else
+                        if (m_storage->commit())
+                            return;
+                        else
+                        {
+                            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                            m_storage->rollback();
+                        }
+
+                    m_storage->setEditorGeometry(entity, fromQRect(dialog.geometry()));
+                }
+                else
+                {
+                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                    m_storage->rollback();
+                }
+            }
+            else
+                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+        }
+    }
+    else
+        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+
+    files.clear();
 }
 
 void FileSystemNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)

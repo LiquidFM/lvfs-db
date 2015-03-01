@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "widgets/lvfs_db_RatingValueWidget.h"
 
 
-class RatingValueDialog : public NestedPlainDialog
+class PLATFORM_MAKE_PRIVATE RatingValueDialog : public NestedPlainDialog
 {
 public:
     RatingValueDialog(const QString &title, QWidget *parent = 0);

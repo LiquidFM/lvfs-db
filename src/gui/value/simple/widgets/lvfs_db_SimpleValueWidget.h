@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 
 template <typename T>
-class MainSimpleValueWidget : public BaseNestedWidget
+class PLATFORM_MAKE_PRIVATE MainSimpleValueWidget : public BaseNestedWidget
 {
 public:
     MainSimpleValueWidget(NestedDialog *parent, const T &value = T());
@@ -89,7 +89,7 @@ T MainSimpleValueWidget<T>::value() const
 
 
 template <typename T>
-class SimpleValueWidget : public NestedWidget
+class PLATFORM_MAKE_PRIVATE SimpleValueWidget : public NestedWidget
 {
 public:
     SimpleValueWidget(NestedDialog *parent, const QString &title, const T &value = T());

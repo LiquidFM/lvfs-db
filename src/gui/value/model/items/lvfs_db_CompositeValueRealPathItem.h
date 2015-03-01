@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 namespace LVFS {
 namespace Db {
 
-class CompositeValueRealPathItem : public CompositeValuePathItem
+class PLATFORM_MAKE_PRIVATE CompositeValueRealPathItem : public CompositeValuePathItem
 {
 public:
     CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent = 0);

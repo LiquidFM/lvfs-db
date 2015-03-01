@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,15 +32,15 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class CompositeValueModel : public Model
+class PLATFORM_MAKE_PRIVATE CompositeValueModel : public Model
 {
 public:
-    typedef EntityValue::List                      ValueList;
-//    typedef QMap<Entity::Id, const SnapshotItem *> Files;
+    typedef EntityValue::List                   ValueList;
+    typedef QMap<Entity::Id, Interface::Holder> Files;
 
 public:
     CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent = 0);
-//    CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, const Files &files, QObject *parent = 0);
+    CompositeValueModel(const EntityValue &value, const Interface::Adaptor<IStorage> &container, const Files &files, QObject *parent = 0);
 
     virtual ::Qt::ItemFlags flags(const QModelIndex &index) const;
 

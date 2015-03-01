@@ -22,6 +22,7 @@
 
 #include <lvfs-core/INode>
 #include <lvfs-db/IStorage>
+#include <QtCore/QCoreApplication>
 
 
 namespace LVFS {
@@ -29,6 +30,8 @@ namespace Db {
 
 class PLATFORM_MAKE_PRIVATE FileSystemNode : public ExtendsBy<Core::INode>
 {
+    Q_DECLARE_TR_FUNCTIONS(FileSystemNode)
+
 public:
     FileSystemNode(const Interface::Adaptor<IStorage> &storage, const Interface::Holder &node);
     virtual ~FileSystemNode();

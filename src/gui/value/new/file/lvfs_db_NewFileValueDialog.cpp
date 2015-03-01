@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,16 @@
 #include "../../model/items/lvfs_db_CompositeValuePropertyItem.h"
 
 
-//NewFileValueDialog::NewFileValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
-//    NewCompositeValueDialog(container, value, files, parent)
-//{}
+NewFileValueDialog::NewFileValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
+    NewCompositeValueDialog(container, value, files, parent)
+{}
 
 void NewFileValueDialog::addValue()
 {
     QModelIndex index = currentIndex();
 
-//    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isProperty() &&
-//        static_cast<CompositeValuePropertyItem *>(index.internalPointer())->entity().type() != Entity::Path)
+    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isProperty() &&
+        container()->schema(static_cast<CompositeValuePropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
         doAddValue(index);
 }
 
@@ -38,7 +38,7 @@ void NewFileValueDialog::removeValue()
 {
     QModelIndex index = currentIndex();
 
-//    if (index.isValid() && !static_cast<CompositeValueItem *>(index.internalPointer())->isProperty() &&
-//        static_cast<CompositeValuePropertyItem *>(index.internalPointer())->entity()->type() != Database::Path)
+    if (index.isValid() && !static_cast<CompositeValueItem *>(index.internalPointer())->isProperty() &&
+        container()->schema(static_cast<CompositeValuePropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
         doRemoveValue(index);
 }

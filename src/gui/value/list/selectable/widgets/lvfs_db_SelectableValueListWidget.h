@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "../../editable/widgets/lvfs_db_EditableValueListWidget.h"
 
 
-class SelectableValueListWidget : public EditableValueListWidget
+class PLATFORM_MAKE_PRIVATE SelectableValueListWidget : public EditableValueListWidget
 {
 public:
     SelectableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);

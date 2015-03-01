@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ using namespace ::LVFS;
 using namespace ::LVFS::Db;
 using namespace ::LVFS::Tools;
 
-class CompositeValueWidgetPrivate
+class PLATFORM_MAKE_PRIVATE CompositeValueWidgetPrivate
 {
 public:
     class ICallback
@@ -56,7 +56,7 @@ public:
 
 public:
     CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value);
-//    CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files);
+    CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files);
 
     const Interface::Adaptor<IStorage> &container() const { return m_container; }
     Interface::Adaptor<IStorage> &container() { return m_container; }
@@ -81,11 +81,11 @@ private:
 };
 
 
-class MainCompositeValueWidget : public BaseNestedWidget, public CompositeValueWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE MainCompositeValueWidget : public BaseNestedWidget, public CompositeValueWidgetPrivate::ICallback
 {
 public:
     MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, NestedDialog *parent);
-//    MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent);
+    MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent);
 
     /* BaseNestedWidget */
     virtual QWidget *centralWidget();
@@ -115,7 +115,7 @@ private:
 };
 
 
-class CompositeValueWidget : public NestedWidget, public CompositeValueWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE CompositeValueWidget : public NestedWidget, public CompositeValueWidgetPrivate::ICallback
 {
 public:
     CompositeValueWidget(const Interface::Adaptor<IStorage> &container, const EntityValue &value, NestedDialog *parent, const QString &title);

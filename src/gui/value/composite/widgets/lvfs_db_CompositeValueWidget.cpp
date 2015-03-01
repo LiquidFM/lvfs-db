@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,18 +42,18 @@ CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, Ev
     m_view.setItemDelegate(&m_delegate);
 }
 
-//CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files) :
-//    m_callback(callback),
-//    m_container(container),
-//    m_value(value),
-//    m_view(handler),
-//    m_model(m_value, m_container, files),
-//    m_delegate(m_value, m_container)
-//{
-//    m_view.setHeaderHidden(true);
-//    m_view.setModel(&m_model);
-//    m_view.setItemDelegate(&m_delegate);
-//}
+CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files) :
+    m_callback(callback),
+    m_container(container),
+    m_value(value),
+    m_view(handler),
+    m_model(m_value, m_container, files),
+    m_delegate(m_value, m_container)
+{
+    m_view.setHeaderHidden(true);
+    m_view.setModel(&m_model);
+    m_view.setItemDelegate(&m_delegate);
+}
 
 void CompositeValueWidgetPrivate::open(const QModelIndex &index)
 {
@@ -121,10 +121,10 @@ MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const 
     m_private(this, handler, container, value)
 {}
 
-//MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent) :
-//    BaseNestedWidget(parent),
-//    m_private(this, handler, container, value, files)
-//{}
+MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent) :
+    BaseNestedWidget(parent),
+    m_private(this, handler, container, value, files)
+{}
 
 QWidget *MainCompositeValueWidget::centralWidget()
 {

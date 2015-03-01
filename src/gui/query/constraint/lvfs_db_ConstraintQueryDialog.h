@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2014 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ using namespace ::LVFS::Db;
 using namespace ::LVFS::Tools;
 using namespace ::LiquidDb;
 
-class ConstraintQueryDialog : public QDialog
+class PLATFORM_MAKE_PRIVATE ConstraintQueryDialog : public QDialog
 {
     Q_OBJECT
 
