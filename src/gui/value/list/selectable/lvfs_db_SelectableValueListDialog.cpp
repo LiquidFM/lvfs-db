@@ -18,16 +18,26 @@
  */
 
 #include "lvfs_db_SelectableValueListDialog.h"
+#include "../../../../model/items/lvfs_db_FileItem.h"
 
 
 SelectableValueListDialog::SelectableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
     EditableValueListDialog(container, reader, parent)
 {}
 
-void SelectableValueListDialog::accept()
+void SelectableValueListDialog::dblClick()
 {
-    if (currentIndex().isValid())
-        EditableValueListDialog::accept();
+    QModelIndex index = currentIndex();
+
+    if (index.isValid())
+    {
+        Item *item = static_cast<Item *>(index.internalPointer());
+
+        if (item->isPath() && item->parent() != NULL)
+            static_cast<FileItem *>(item)->open();
+        else
+            accept();
+    }
     else
         warning(tr("You must choose one of the values."));
 }

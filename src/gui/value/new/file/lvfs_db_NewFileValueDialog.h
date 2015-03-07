@@ -30,7 +30,7 @@ class PLATFORM_MAKE_PRIVATE NewFileValueDialog : public NewCompositeValueDialog
     Q_OBJECT
 
 public:
-    NewFileValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent = 0);
+    NewFileValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
 
 protected:
     virtual void addValue();

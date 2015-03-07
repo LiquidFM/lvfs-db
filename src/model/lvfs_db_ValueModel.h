@@ -17,28 +17,40 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef IDM_COMPOSITEVALUEITEM_H_
-#define IDM_COMPOSITEVALUEITEM_H_
+#ifndef LVFS_DB_VALUEMODEL_H_
+#define LVFS_DB_VALUEMODEL_H_
 
+#include <efc/Map>
 #include <lvfs-db/IStorage>
 #include <liquiddb/EntityValue>
-#include "../../../../model/lvfs_db_Model.h"
-#include "../../../../lvfs_db_common.h"
+#include "lvfs_db_Model.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE CompositeValueItem : public Model::Item
+using namespace LiquidDb;
+
+
+class PLATFORM_MAKE_PRIVATE ValueModel : public Model
 {
 public:
-    CompositeValueItem(Item *parent = 0);
+    typedef EFC::Map<Entity::Id, Interface::Holder> Files;
 
-    virtual bool isPath() const;
-    virtual bool isValue() const;
-    virtual bool isProperty() const;
+public:
+    ValueModel(QObject *parent = 0);
+
+    virtual ::Qt::ItemFlags flags(const QModelIndex &index) const;
+
+    void add(const QModelIndex &property, const EntityValue &value);
+    void add(const QModelIndex &property, const EntityValue::List &values);
+    void set(const Interface::Adaptor<IStorage> &storage, const EntityValue &value);
+    void set(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const Files &files);
+
+    void remove(const QModelIndex &index);
+    void update(const QModelIndex &index);
 };
 
 }}
 
-#endif /* IDM_COMPOSITEVALUEITEM_H_ */
+#endif /* LVFS_DB_VALUEMODEL_H_ */

@@ -29,7 +29,7 @@ class PLATFORM_MAKE_PRIVATE NewCompositeValueDialog : public CompositeValueDialo
 
 public:
     NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent = 0);
-    NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent = 0);
+    NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
 };
 
 #endif /* LVFS_DB_NEWCOMPOSITEVALUEDIALOG_H_ */

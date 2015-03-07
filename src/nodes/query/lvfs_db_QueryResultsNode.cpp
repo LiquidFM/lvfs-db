@@ -38,6 +38,7 @@ QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &container
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
 {
+    ASSERT(m_reader.isValid());
     ASSERT(m_sorting.first < columnCount(QModelIndex()));
 }
 

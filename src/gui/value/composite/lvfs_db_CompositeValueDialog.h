@@ -30,7 +30,7 @@ class PLATFORM_MAKE_PRIVATE CompositeValueDialog : public NestedPlainDialog
 
 public:
     CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent = 0);
-    CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent = 0);
+    CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
 
 protected:
     virtual void addValue();
@@ -42,8 +42,8 @@ protected:
     const Interface::Adaptor<IStorage> &container() const { return m_mainWidget.container(); }
     Interface::Adaptor<IStorage> &container() { return m_mainWidget.container(); }
 
-    const CompositeValueModel &model() const { return m_mainWidget.model(); }
-    CompositeValueModel &model() { return m_mainWidget.model(); }
+    const ValueModel &model() const { return m_mainWidget.model(); }
+    ValueModel &model() { return m_mainWidget.model(); }
 
     void doOpenFile(const QModelIndex &index) { m_mainWidget.open(index); }
     void doAddValue(const QModelIndex &index) { m_mainWidget.addValue(index); }

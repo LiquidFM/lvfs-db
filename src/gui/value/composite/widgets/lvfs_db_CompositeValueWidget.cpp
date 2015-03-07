@@ -18,9 +18,9 @@
  */
 
 #include "lvfs_db_CompositeValueWidget.h"
-#include "../../model/items/lvfs_db_CompositeValueValueItem.h"
-#include "../../model/items/lvfs_db_CompositeValuePathItem.h"
-#include "../../model/items/lvfs_db_CompositeValuePropertyItem.h"
+#include "../../../../model/items/lvfs_db_FileItem.h"
+#include "../../../../model/items/lvfs_db_ValueItem.h"
+#include "../../../../model/items/lvfs_db_PropertyItem.h"
 #include "../../list/selectable/widgets/lvfs_db_SelectableValueListWidget.h"
 
 #include <liquiddb/EntityValueReader>
@@ -34,22 +34,22 @@ CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, Ev
     m_container(container),
     m_value(value),
     m_view(handler),
-    m_model(m_value, m_container),
     m_delegate(m_value, m_container)
 {
+    m_model.set(m_container, m_value);
     m_view.setHeaderHidden(true);
     m_view.setModel(&m_model);
     m_view.setItemDelegate(&m_delegate);
 }
 
-CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files) :
+CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files) :
     m_callback(callback),
     m_container(container),
     m_value(value),
     m_view(handler),
-    m_model(m_value, m_container, files),
     m_delegate(m_value, m_container)
 {
+    m_model.set(m_container, m_value, files);
     m_view.setHeaderHidden(true);
     m_view.setModel(&m_model);
     m_view.setItemDelegate(&m_delegate);
@@ -57,12 +57,12 @@ CompositeValueWidgetPrivate::CompositeValueWidgetPrivate(ICallback *callback, Ev
 
 void CompositeValueWidgetPrivate::open(const QModelIndex &index)
 {
-    static_cast<CompositeValuePathItem *>(index.internalPointer())->open();
+    static_cast<FileItem *>(index.internalPointer())->open();
 }
 
 void CompositeValueWidgetPrivate::addValue(const QModelIndex &index)
 {
-    const Entity &entity = static_cast<CompositeValuePropertyItem *>(index.internalPointer())->entity();
+    const Entity &entity = static_cast<PropertyItem *>(index.internalPointer())->entity();
 
     if (m_container->transaction())
     {
@@ -96,7 +96,7 @@ void CompositeValueWidgetPrivate::addValue(const QModelIndex &index)
 
 void CompositeValueWidgetPrivate::removeValue(const QModelIndex &index)
 {
-    EntityValue value(static_cast<CompositeValueValueItem *>(index.internalPointer())->value());
+    EntityValue value(static_cast<ValueItem *>(index.internalPointer())->value());
 
     if (m_container->transaction())
         if (m_container->removeValue(m_value, value))
@@ -121,7 +121,7 @@ MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const 
     m_private(this, handler, container, value)
 {}
 
-MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent) :
+MainCompositeValueWidget::MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, NestedDialog *parent) :
     BaseNestedWidget(parent),
     m_private(this, handler, container, value, files)
 {}
@@ -182,7 +182,7 @@ void CompositeValueWidget::addValue()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isProperty())
+    if (index.isValid() && static_cast<Item *>(index.internalPointer())->isProperty())
         m_private.addValue(index);
 }
 
@@ -190,6 +190,6 @@ void CompositeValueWidget::removeValue()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && !static_cast<CompositeValueItem *>(index.internalPointer())->isProperty())
+    if (index.isValid() && !static_cast<Item *>(index.internalPointer())->isProperty())
         m_private.removeValue(index);
 }

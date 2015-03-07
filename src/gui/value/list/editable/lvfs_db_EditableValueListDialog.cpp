@@ -18,7 +18,7 @@
  */
 
 #include "lvfs_db_EditableValueListDialog.h"
-#include "../../../../lvfs_db_common.h"
+#include "../../../../model/items/lvfs_db_FileItem.h"
 
 
 EditableValueListDialog::EditableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
@@ -33,7 +33,7 @@ EditableValueListDialog::EditableValueListDialog(const Interface::Adaptor<IStora
 
     setWindowTitle(tr("Values of \"%1\"").arg(toUnicode(m_widget.entity().name())));
 
-    m_handler.registerMouseDoubleClickEventHandler(&EditableValueListDialog::accept);
+    m_handler.registerMouseDoubleClickEventHandler(&EditableValueListDialog::dblClick);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Insert, &EditableValueListDialog::addValue);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Delete, &EditableValueListDialog::removeValue);
     m_handler.registerShortcut(Qt::CTRL, Qt::Key_F, &EditableValueListDialog::setFocusToFilter);
@@ -47,19 +47,14 @@ EditableValueListDialog::~EditableValueListDialog()
 
 void EditableValueListDialog::accept()
 {
-    closeDbContext();
+    m_widget.closeDbContext();
     NestedPlainDialog::accept();
 }
 
 void EditableValueListDialog::reject()
 {
-    closeDbContext();
-    NestedPlainDialog::reject();
-}
-
-void EditableValueListDialog::closeDbContext()
-{
     m_widget.closeDbContext();
+    NestedPlainDialog::reject();
 }
 
 EntityValue EditableValueListDialog::takeValue()
@@ -70,6 +65,19 @@ EntityValue EditableValueListDialog::takeValue()
 QModelIndex EditableValueListDialog::currentIndex() const
 {
     return m_widget.currentIndex();
+}
+
+void EditableValueListDialog::dblClick()
+{
+    QModelIndex index = currentIndex();
+
+    if (index.isValid())
+    {
+        Item *item = static_cast<Item *>(index.internalPointer());
+
+        if (item->isPath())
+            static_cast<FileItem *>(item)->open();
+    }
 }
 
 void EditableValueListDialog::addValue()

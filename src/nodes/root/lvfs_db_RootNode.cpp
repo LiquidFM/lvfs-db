@@ -182,7 +182,7 @@ Interface::Holder RootNode::search(const QModelIndex &file, const Interface::Hol
                 {
                     EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
 
-                    if (m_container->commit())
+                    if (reader.isValid() && m_container->commit())
                         return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
                     else
                     {

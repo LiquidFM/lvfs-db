@@ -37,7 +37,7 @@ namespace Db {
 
 
 QueryResultRootPathValueItem::QueryResultRootPathValueItem(const Interface::Adaptor<IStorage> &container, const EntityValue &value, Item *parent) :
-    QueryResultPathItem(container, toUnicode(value.value().asString()), parent),
+    QueryResultPathItem(container, value.value().asString(), parent),
     m_value(value),
     m_container(container)
 {
@@ -51,17 +51,20 @@ bool QueryResultRootPathValueItem::isRootPathValue()
 
 void QueryResultRootPathValueItem::open() const
 {
-    Interface::Holder apps = Module::desktop().applications(m_file->as<IEntry>()->type());
-
-    if (apps.isValid())
+    if (m_file.isValid())
     {
-        ASSERT(apps->as<IApplications>() != NULL);
-        IApplications::const_iterator iterator = apps->as<IApplications>()->begin();
+        Interface::Holder apps = Module::desktop().applications(m_file->as<IEntry>()->type());
 
-        if (iterator != apps->as<IApplications>()->end())
+        if (apps.isValid())
         {
-            ASSERT((*iterator)->as<IApplication>() != NULL);
-            (*iterator)->as<IApplication>()->open(m_file->as<IEntry>());
+            ASSERT(apps->as<IApplications>() != NULL);
+            IApplications::const_iterator iterator = apps->as<IApplications>()->begin();
+
+            if (iterator != apps->as<IApplications>()->end())
+            {
+                ASSERT((*iterator)->as<IApplication>() != NULL);
+                (*iterator)->as<IApplication>()->open(m_file->as<IEntry>());
+            }
         }
     }
 }

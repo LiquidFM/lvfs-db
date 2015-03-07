@@ -33,7 +33,7 @@ class QueryResultPathValueItem : public QueryResultPathItem
     Q_DECLARE_TR_FUNCTIONS(QueryResultPathValueItem)
 
 public:
-//    QueryResultPathValueItem(const IFileContainer *container, SnapshotItem *item, Item *parent);
+//    QueryResultPathValueItem(const Interface::Adaptor<IStorage> &container, SnapshotItem *item, Item *parent);
 
     /* QueryResultItem */
     virtual bool isRootPathValue();
@@ -42,7 +42,7 @@ public:
     virtual void open() const;
 
 private:
-//    const IFileContainer *m_container;
+    Interface::Adaptor<IStorage> m_container;
 //    IFileContainer::Holder m_thisContainer;
 };
 

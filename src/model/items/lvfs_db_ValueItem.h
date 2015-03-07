@@ -17,29 +17,36 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueItem.h"
+#ifndef LVFS_DB_VALUEITEM_H_
+#define LVFS_DB_VALUEITEM_H_
+
+#include <lvfs-db/IStorage>
+#include "lvfs_db_Item.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueItem::CompositeValueItem(Item *parent) :
-    Item(parent)
-{}
-
-bool CompositeValueItem::isPath() const
+class PLATFORM_MAKE_PRIVATE ValueItem : public Item
 {
-    return false;
-}
+public:
+    ValueItem(const EntityValue &value, Item *parent = 0);
+    ValueItem(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, Item *parent = 0);
+    virtual ~ValueItem();
 
-bool CompositeValueItem::isValue() const
-{
-    return false;
-}
+    virtual QVariant data(qint32 column, qint32 role) const;
 
-bool CompositeValueItem::isProperty() const
-{
-    return false;
-}
+    virtual bool isValue() const;
+
+    const EntityValue &value() const { return m_value; }
+    EntityValue take() { EntityValue res(m_value); m_value = EntityValue(); return res; }
+
+protected:
+    EntityValue m_value;
+    QVariant m_cache;
+};
 
 }}
+
+#endif /* LVFS_DB_VALUEITEM_H_ */
+

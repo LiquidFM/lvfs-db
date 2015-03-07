@@ -17,50 +17,32 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_InvalidFile.h"
+#ifndef LVFS_DB_VALUEDELEGATE_H_
+#define LVFS_DB_VALUEDELEGATE_H_
 
-#include <lvfs/Module>
-
-#include <cstring>
-#include <cstdlib>
+#include <lvfs-db/IStorage>
+#include "lvfs_db_Delegate.h"
 
 
 namespace LVFS {
 namespace Db {
 
-InvalidFile::InvalidFile(const char *file) :
-    m_title(::strdup(file)),
-    m_type(Module::desktop().typeOfUnknownFile())
-{}
-
-InvalidFile::~InvalidFile()
+class PLATFORM_MAKE_PRIVATE ValueDelegate : public Delegate
 {
-    ::free(m_title);
-}
+    PLATFORM_MAKE_NONCOPYABLE(ValueDelegate)
 
-const char *InvalidFile::title() const
-{
-    return m_title;
-}
+public:
+    ValueDelegate(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent = 0);
 
-const char *InvalidFile::schema() const
-{
-    return "";
-}
+    virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
-const char *InvalidFile::location() const
-{
-    return m_title;
-}
-
-const IType *InvalidFile::type() const
-{
-    return m_type->as<IType>();
-}
-
-Interface::Holder InvalidFile::open(IFile::Mode mode) const
-{
-    return Interface::Holder();
-}
+private:
+    const Entity &m_entity;
+    Interface::Adaptor<IStorage> m_container;
+};
 
 }}
+
+#endif /* LVFS_DB_VALUEDELEGATE_H_ */

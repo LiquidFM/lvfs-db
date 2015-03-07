@@ -18,28 +18,25 @@
  */
 
 #include "lvfs_db_EditableValueListModel.h"
+#include "../../../../../model/items/lvfs_db_ValueItem.h"
+
+#include <brolly/assert.h>
 
 
 namespace LVFS {
 namespace Db {
 
-EditableValueListModel::EditableValueListModel(const EntityValueReader &reader, QObject *parent) :
-    ValueListModel(reader, parent)
+EditableValueListModel::EditableValueListModel(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QObject *parent) :
+    ListValueModel(storage, reader, parent)
 {}
-
-void EditableValueListModel::add(const List &list)
-{
-    ValueListModel::add(list);
-}
 
 QModelIndex EditableValueListModel::add(const EntityValue &value)
 {
-    return ValueListModel::add(value);
-}
+    beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
+    m_items.push_back(new ValueItem(value));
+    endInsertRows();
 
-void EditableValueListModel::remove(const QModelIndex &index)
-{
-    ValueListModel::remove(index);
+    return index(m_items.size() - 1, 0, QModelIndex());
 }
 
 }}

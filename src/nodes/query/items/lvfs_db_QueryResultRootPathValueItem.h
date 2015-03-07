@@ -34,7 +34,7 @@ using namespace LiquidDb;
 
 class QueryResultRootPathValueItem : public QueryResultPathItem
 {
-    Q_DECLARE_TR_FUNCTIONS(QueryResultPathValueItem)
+    Q_DECLARE_TR_FUNCTIONS(QueryResultRootPathValueItem)
 
 public:
     QueryResultRootPathValueItem(const Interface::Adaptor<IStorage> &container, const EntityValue &value, Item *parent);

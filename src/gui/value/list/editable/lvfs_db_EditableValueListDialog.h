@@ -36,9 +36,9 @@ public:
     virtual void reject();
 
 protected:
-    void closeDbContext();
     EntityValue takeValue();
     QModelIndex currentIndex() const;
+    virtual void dblClick();
 
 private:
     typedef MouseDoubleClickEventHandler<

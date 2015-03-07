@@ -20,20 +20,18 @@
 #ifndef LVFS_DB_EDITABLEVALUELISTMODEL_H_
 #define LVFS_DB_EDITABLEVALUELISTMODEL_H_
 
-#include "../../../model/lvfs_db_ValueListModel.h"
+#include "../../../../../model/lvfs_db_ListValueModel.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE EditableValueListModel : public ValueListModel
+class PLATFORM_MAKE_PRIVATE EditableValueListModel : public ListValueModel
 {
 public:
-    EditableValueListModel(const EntityValueReader &reader, QObject *parent = 0);
+    EditableValueListModel(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QObject *parent = 0);
 
-    void add(const List &list);
     QModelIndex add(const EntityValue &value);
-    void remove(const QModelIndex &index);
 };
 
 }}

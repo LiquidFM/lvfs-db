@@ -17,28 +17,32 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueValueItem.h"
+#include "lvfs_db_Item.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueValueItem::CompositeValueValueItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValueItem(parent),
-    m_value(value)
+Item::Item(Item *parent) :
+    ListItem(parent)
 {}
 
-QVariant CompositeValueValueItem::data(qint32 column, qint32 role) const
+Item::~Item()
+{}
+
+bool Item::isPath() const
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
+    return false;
 }
 
-bool CompositeValueValueItem::isValue() const
+bool Item::isValue() const
 {
-    return true;
+    return false;
+}
+
+bool Item::isProperty() const
+{
+    return false;
 }
 
 }}

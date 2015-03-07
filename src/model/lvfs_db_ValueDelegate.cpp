@@ -17,11 +17,12 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueDelegate.h"
-#include "items/lvfs_db_CompositeValueItem.h"
-#include "items/lvfs_db_CompositeValueValueItem.h"
-#include "items/lvfs_db_CompositeValuePropertyItem.h"
-#include "../edit/lvfs_db_EditCompositeValueDialog.h"
+#include "lvfs_db_ValueDelegate.h"
+
+#include "items/lvfs_db_FileItem.h"
+#include "items/lvfs_db_ValueItem.h"
+#include "items/lvfs_db_PropertyItem.h"
+#include "../gui/value/edit/lvfs_db_EditCompositeValueDialog.h"
 
 #include <lvfs-core/tools/widgets/ValueDialog>
 #include <QtGui/QMessageBox>
@@ -30,17 +31,17 @@
 namespace LVFS {
 namespace Db {
 
-CompositeValueDelegate::CompositeValueDelegate(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent) :
+ValueDelegate::ValueDelegate(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent) :
     Delegate(parent),
     m_entity(value.entity()),
     m_container(container)
 {}
 
-QWidget *CompositeValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (static_cast<CompositeValueItem *>(index.internalPointer())->isValue())
+    if (static_cast<Item *>(index.internalPointer())->isValue())
     {
-        CompositeValueValueItem *item = static_cast<CompositeValueValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
 
         switch (item->value().entity().type())
         {
@@ -96,17 +97,17 @@ QWidget *CompositeValueDelegate::createEditor(QWidget *parent, const QStyleOptio
         }
     }
     else
-        if (static_cast<CompositeValueItem *>(index.internalPointer())->isProperty())
+        if (static_cast<Item *>(index.internalPointer())->isProperty())
             return new Editor<QString>::type(parent);
 
     return NULL;
 }
 
-void CompositeValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    if (static_cast<CompositeValueItem *>(index.internalPointer())->isValue())
+    if (static_cast<Item *>(index.internalPointer())->isValue())
     {
-        CompositeValueValueItem *item = static_cast<CompositeValueValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
 
         switch (item->value().entity().type())
         {
@@ -148,14 +149,14 @@ void CompositeValueDelegate::setEditorData(QWidget *editor, const QModelIndex &i
         }
     }
     else
-        EditorValue<QString>::setValue(editor, static_cast<CompositeValuePropertyItem *>(index.internalPointer())->name());
+        EditorValue<QString>::setValue(editor, static_cast<PropertyItem *>(index.internalPointer())->name());
 }
 
-void CompositeValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    if (static_cast<CompositeValueItem *>(index.internalPointer())->isValue())
+    if (static_cast<Item *>(index.internalPointer())->isValue())
     {
-        CompositeValueValueItem *item = static_cast<CompositeValueValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
         ::EFC::Variant value;
 
         switch (item->value().entity().type())
@@ -245,7 +246,7 @@ void CompositeValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
     else
         if (m_container->transaction())
         {
-            CompositeValuePropertyItem *property = static_cast<CompositeValuePropertyItem *>(index.internalPointer());
+            PropertyItem *property = static_cast<PropertyItem *>(index.internalPointer());
 
             if (m_container->renameProperty(m_entity, property->entity(), fromUnicode(EditorValue<QString>::value(editor)).data()))
             {

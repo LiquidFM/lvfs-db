@@ -19,9 +19,9 @@
 
 #include "lvfs_db_EditableValueListWidget.h"
 #include "../../../composite/widgets/lvfs_db_CompositeValueWidget.h"
-#include "../../../../../lvfs_db_common.h"
 #include "../../../simple/rating/widgets/lvfs_db_RatingValueWidget.h"
 #include "../../../simple/widgets/lvfs_db_SimpleValueWidget.h"
+#include "../../../../../model/items/lvfs_db_ValueItem.h"
 
 
 template <Entity::Type EntityType>
@@ -138,7 +138,7 @@ EditableValueListWidgetPrivate::EditableValueListWidgetPrivate(ICallback *callba
     m_filter(&m_handler, this),
     m_search(QIcon(), QString(), this),
     m_view(handler, this),
-    m_model(reader)
+    m_model(container, reader)
 {
     m_vLayout.setMargin(1);
     m_vLayout.setSpacing(1);
@@ -239,13 +239,18 @@ void EditableValueListWidgetPrivate::removeValue()
 
     if (index.isValid())
     {
-        Entity::IdsList list;
-        list.push_back(m_model.at(index.row()).id());
+        Item *item = static_cast<Item *>(index.internalPointer());
 
-        if (m_container->removeValue(m_entity, list))
-            m_model.remove(index);
-        else
-            m_callback->critical(toUnicode(m_container->lastError()));
+        if (item->parent() == NULL && item->isValue())
+        {
+            Entity::IdsList list;
+            list.push_back(static_cast<ValueItem *>(item)->value().id());
+
+            if (m_container->removeValue(m_entity, list))
+                m_model.remove(index);
+            else
+                m_callback->critical(toUnicode(m_container->lastError()));
+        }
     }
 }
 
@@ -277,7 +282,10 @@ void EditableValueListWidgetPrivate::clearFilter()
 
 void EditableValueListWidgetPrivate::selectValue(const QModelIndex &index)
 {
-    m_filter.setText(toUnicode(m_model.at(m_proxy.mapToSource(index).row()).value().asString()));
+    Item *item = static_cast<Item *>(m_proxy.mapToSource(index).internalPointer());
+
+    if (item->parent() == NULL && item->isValue())
+        m_filter.setText(toUnicode(static_cast<ValueItem *>(item)->value().value().asString()));
 }
 
 void EditableValueListWidgetPrivate::setCurrentIndex(const QModelIndex &index) const

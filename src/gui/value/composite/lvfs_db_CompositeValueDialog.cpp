@@ -18,9 +18,7 @@
  */
 
 #include "lvfs_db_CompositeValueDialog.h"
-#include "../model/items/lvfs_db_CompositeValueValueItem.h"
-#include "../model/items/lvfs_db_CompositeValuePropertyItem.h"
-#include "../../../lvfs_db_common.h"
+#include "../../../model/items/lvfs_db_ValueItem.h"
 
 
 CompositeValueDialog::CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent) :
@@ -44,7 +42,7 @@ CompositeValueDialog::CompositeValueDialog(const Interface::Adaptor<IStorage> &c
     setCentralWidget(&m_mainWidget);
 }
 
-CompositeValueDialog::CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
+CompositeValueDialog::CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent) :
     NestedPlainDialog(parent),
     m_handler(this),
     m_mainWidget(&m_handler, container, value, files, this)
@@ -69,7 +67,7 @@ void CompositeValueDialog::addValue()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isProperty())
+    if (index.isValid() && static_cast<ValueItem *>(index.internalPointer())->isProperty())
         doAddValue(index);
 }
 
@@ -77,7 +75,7 @@ void CompositeValueDialog::removeValue()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && !static_cast<CompositeValueItem *>(index.internalPointer())->isProperty())
+    if (index.isValid() && !static_cast<ValueItem *>(index.internalPointer())->isProperty())
         doRemoveValue(index);
 }
 
@@ -85,7 +83,7 @@ void CompositeValueDialog::openFile1()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isPath())
+    if (index.isValid() && static_cast<ValueItem *>(index.internalPointer())->isPath())
         doOpenFile(index);
 }
 
@@ -93,7 +91,7 @@ void CompositeValueDialog::openFile2()
 {
     QModelIndex index = currentIndex();
 
-    if (index.isValid() && static_cast<CompositeValueItem *>(index.internalPointer())->isPath())
+    if (index.isValid() && static_cast<ValueItem *>(index.internalPointer())->isPath())
         doOpenFile(index);
     else
         accept();

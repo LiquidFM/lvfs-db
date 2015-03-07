@@ -27,7 +27,7 @@ NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStora
     setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
 }
 
-NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, QWidget *parent) :
+NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent) :
     CompositeValueDialog(container, value, files, parent)
 {
     setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));

@@ -30,8 +30,10 @@ class PLATFORM_MAKE_PRIVATE SelectableValueListDialog : public EditableValueList
 public:
     SelectableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent = 0);
 
-    EntityValue takeValue() { return EditableValueListDialog::takeValue(); }
-    virtual void accept();
+    using EditableValueListDialog::takeValue;
+
+protected:
+    virtual void dblClick();
 };
 
 #endif /* LVFS_DB_SELECTABLEVALUELISTDIALOG_H_ */

@@ -20,6 +20,11 @@
 #include <lvfs-core/models/Qt/SortFilterModel>
 #include "lvfs_db_QueryResultPathValueItem.h"
 
+#include <lvfs/Module>
+#include <lvfs/IEntry>
+#include <lvfs/IApplication>
+#include <lvfs/IApplications>
+
 
 namespace LVFS {
 namespace Db {
@@ -52,7 +57,19 @@ bool QueryResultPathValueItem::isRootPathValue()
 
 void QueryResultPathValueItem::open() const
 {
-//    Application::open(m_container, info());
+//    Interface::Holder apps = Module::desktop().applications(m_source->as<IEntry>()->type());
+//
+//    if (apps.isValid())
+//    {
+//        ASSERT(apps->as<IApplications>() != NULL);
+//        IApplications::const_iterator iterator = apps->as<IApplications>()->begin();
+//
+//        if (iterator != apps->as<IApplications>()->end())
+//        {
+//            ASSERT((*iterator)->as<IApplication>() != NULL);
+//            (*iterator)->as<IApplication>()->open(m_source->as<IEntry>());
+//        }
+//    }
 }
 
 }}

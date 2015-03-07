@@ -17,37 +17,41 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_CompositeValueRealPathItem.h"
+#ifndef LVFS_DB_FILEITEM_H_
+#define LVFS_DB_FILEITEM_H_
+
+#include <QtCore/QCoreApplication>
+#include <QtGui/QIcon>
+#include "lvfs_db_Item.h"
 
 
 namespace LVFS {
 namespace Db {
 
-CompositeValueRealPathItem::CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent) :
-    CompositeValuePathItem(value, parent)
-{}
-
-QVariant CompositeValueRealPathItem::data(qint32 column, qint32 role) const
+class PLATFORM_MAKE_PRIVATE FileItem : public Item
 {
-    if (role == Qt::DisplayRole)
-        return toQVariant(m_value.value());
-    else
-        return QVariant();
-}
+    Q_DECLARE_TR_FUNCTIONS(FileItem)
 
-QString CompositeValueRealPathItem::fileName() const
-{
-    return QString();
-}
+public:
+    FileItem(const EntityValue &value, const Interface::Holder &file, Item *parent = 0);
+    virtual ~FileItem();
 
-bool CompositeValueRealPathItem::isFile() const
-{
-    return false;
-}
+    virtual QVariant data(qint32 column, qint32 role) const;
 
-void CompositeValueRealPathItem::open() const
-{
+    virtual bool isPath() const;
 
-}
+    virtual void open() const;
+
+protected:
+    const Interface::Holder &file() const { return m_file; }
+
+private:
+    Interface::Holder m_file;
+    QString m_name;
+    QString m_toolTip;
+    QIcon m_icon;
+};
 
 }}
+
+#endif /* LVFS_DB_FILEITEM_H_ */

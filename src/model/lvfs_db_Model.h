@@ -31,10 +31,12 @@ namespace Db {
 class PLATFORM_MAKE_PRIVATE Model : public Core::Tools::TreeModel
 {
 public:
+    typedef EFC::Vector<Item *> Container;
+
     class ListItem : public Item
     {
     public:
-        typedef EFC::Vector<Item *> Container;
+        typedef Model::Container Container;
 
     public:
         ListItem(Item *parent);
@@ -59,7 +61,7 @@ protected:
     virtual size_type indexOf(Item *item) const;
 
 protected:
-    EFC::Vector<Item *> m_items;
+    Container m_items;
 };
 
 }}

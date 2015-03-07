@@ -17,10 +17,10 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_COMPOSITEVALUEPROPERTYITEM_H_
-#define LVFS_DB_COMPOSITEVALUEPROPERTYITEM_H_
+#ifndef LVFS_DB_PROPERTYITEM_H_
+#define LVFS_DB_PROPERTYITEM_H_
 
-#include "lvfs_db_CompositeValueItem.h"
+#include "lvfs_db_Item.h"
 
 
 namespace LVFS {
@@ -29,39 +29,32 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE CompositeValuePropertyItem : public CompositeValueItem
+class PLATFORM_MAKE_PRIVATE PropertyItem : public Item
 {
 public:
-    typedef QList<Model::Item *> Container;
-
-public:
-    CompositeValuePropertyItem(const Entity::Property &property, Model::Item *parent = 0);
-    virtual ~CompositeValuePropertyItem();
-
-    /* Base */
-    virtual Model::Item *at(size_type index) const;
-    virtual size_type size() const;
-    virtual size_type indexOf(Model::Item *item) const;
+    PropertyItem(const Entity::Property &property, Item *parent = 0);
+    virtual ~PropertyItem();
 
     virtual QVariant data(qint32 column, qint32 role) const;
 
-    /* CompositeValueItem */
     virtual bool isProperty() const;
 
     const Entity &entity() const { return m_property.entity; }
-    QString name() const { return toUnicode(m_property.name); }
-    void setName(const QString &value) { m_property.name = fromUnicode(value).data(); }
+
+    const QString &name() const { return m_name; }
+    void setName(const QString &value) { m_property.name = fromUnicode(m_name = value).data(); }
 
 protected:
-    friend class CompositeValueModel;
-    void add(Model::Item *item) { m_items.push_back(item); }
-    void remove(size_type index) { delete m_items.takeAt(index); }
+    friend class ValueModel;
+    friend class ValueItem;
+    void add(Item *item) { m_items.push_back(item); }
+    void remove(size_type index) { Container::iterator i = m_items.begin() + index; delete (*i); m_items.erase(i); }
 
 private:
     Entity::Property m_property;
-    Container m_items;
+    QString m_name;
 };
 
 }}
 
-#endif /* LVFS_DB_COMPOSITEVALUEPROPERTYITEM_H_ */
+#endif /* LVFS_DB_PROPERTYITEM_H_ */

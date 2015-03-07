@@ -18,8 +18,8 @@
  */
 
 #include "lvfs_db_FileSystemNode.h"
+#include "../../model/lvfs_db_ValueModel.h"
 #include "../../gui/choose/lvfs_db_ChooseEntityDialog.h"
-#include "../../gui/value/model/lvfs_db_CompositeValueModel.h"
 #include "../../gui/value/new/file/lvfs_db_NewFileValueDialog.h"
 #include "../../lvfs_db_common.h"
 
@@ -84,8 +84,8 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
             if (value.isValid())
             {
                 Entity path;
-                CompositeValueModel::Files possibleFiles;
-                CompositeValueModel::ValueList list;
+                EntityValue::List list;
+                ValueModel::Files dbFiles;
                 char buffer[Module::MaxUriLength];
                 char prefix[Module::MaxUriLength];
 
@@ -120,7 +120,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
                             if (localValue.isValid())
                             {
                                 list.push_back(localValue);
-                                possibleFiles[localValue.id()] = (*i);
+                                dbFiles[localValue.id()] = (*i);
                             }
                             else
                             {
@@ -136,7 +136,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
 
                 if (m_storage->addValue(value, list))
                 {
-                    NewFileValueDialog dialog(m_storage, value, possibleFiles, view->as<Core::IView>()->widget());
+                    NewFileValueDialog dialog(m_storage, value, dbFiles, view->as<Core::IView>()->widget());
 
                     if (dialog.exec() != NewFileValueDialog::Accepted)
                         m_storage->rollback();

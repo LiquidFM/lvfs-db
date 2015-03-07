@@ -18,12 +18,11 @@
  */
 
 #include "lvfs_db_QueryResultPathItem.h"
-#include "../lvfs_db_InvalidFile.h"
 #include "../../../lvfs_db_common.h"
 
+#include <lvfs/Module>
 #include <lvfs/IEntry>
 #include <lvfs/IDirectory>
-#include <QtGui/QIcon>
 
 
 namespace LVFS {
@@ -36,15 +35,23 @@ namespace Db {
 //    m_node(NULL)
 //{}
 
-QueryResultPathItem::QueryResultPathItem(const Interface::Adaptor<IStorage> &container, const QString &fileName, Item *parent) :
+QueryResultPathItem::QueryResultPathItem(const Interface::Adaptor<IStorage> &container, const char *fileName, Item *parent) :
     QueryResultItem(parent),
-    m_file(container.interface()->as<IDirectory>()->entry(fromUnicode(fileName), NULL))
+    m_file(container.interface()->as<IDirectory>()->entry(fileName))
 //    m_info(new InvalidInfo(fileName)),
 //    m_location(m_info->fileName()),
 //    m_node(NULL)
 {
-    if (!m_file.isValid())
-        m_file.reset(new (std::nothrow) InvalidFile(fromUnicode(fileName)));
+    if (m_file.isValid())
+    {
+        m_name = toUnicode(m_file->as<IEntry>()->title());
+        m_icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+    }
+    else
+    {
+        m_name = toUnicode(fileName);
+        m_icon.addFile(toUnicode(Module::desktop().typeOfUnknownFile()->as<IType>()->icon()->as<IEntry>()->location()), QSize(16, 16));
+    }
 }
 
 QueryResultPathItem::~QueryResultPathItem()
@@ -78,16 +85,12 @@ QVariant QueryResultPathItem::data(qint32 column, qint32 role) const
     {
         case Qt::EditRole:
         case Qt::DisplayRole:
-            return toUnicode(m_file->as<IEntry>()->title());
+            return m_name;
         case Qt::DecorationRole:
 //            if (isLocked())
 //                return lockIcon();
 //            else
-        {
-            QIcon icon;
-            icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
-            return icon;
-        }
+            return m_icon;
         case Qt::TextAlignmentRole:
             return Qt::AlignLeft;
         case Qt::ToolTipRole:

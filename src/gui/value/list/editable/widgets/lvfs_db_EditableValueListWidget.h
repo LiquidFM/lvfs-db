@@ -31,7 +31,7 @@
 #include <lvfs-core/tools/events/KeyboardEventSource>
 #include <lvfs-core/tools/widgets/NestedWidget>
 #include "../model/lvfs_db_EditableValueListModel.h"
-#include "../../../model/lvfs_db_ValueListProxyModel.h"
+#include "../../../../../model/lvfs_db_FilterValueModel.h"
 
 
 using namespace ::LVFS;
@@ -87,8 +87,8 @@ public:
     const EditableValueListModel &model() const { return m_model; }
     EditableValueListModel &model() { return m_model; }
 
-    const ValueListProxyModel &proxy() const { return m_proxy; }
-    ValueListProxyModel &proxy() { return m_proxy; }
+    const FilterValueModel &proxy() const { return m_proxy; }
+    FilterValueModel &proxy() { return m_proxy; }
 
     QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
 
@@ -119,7 +119,7 @@ private:
 
     TreeView m_view;
     EditableValueListModel m_model;
-    ValueListProxyModel m_proxy;
+    FilterValueModel m_proxy;
 };
 
 

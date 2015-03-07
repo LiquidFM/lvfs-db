@@ -17,29 +17,33 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_COMPOSITEVALUEREALPATHITEM_H_
-#define LVFS_DB_COMPOSITEVALUEREALPATHITEM_H_
+#ifndef LVFS_DB_FILTERVALUEMODEL_H_
+#define LVFS_DB_FILTERVALUEMODEL_H_
 
-#include "lvfs_db_CompositeValuePathItem.h"
+#include <platform/utils.h>
+#include <QtGui/QSortFilterProxyModel>
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE CompositeValueRealPathItem : public CompositeValuePathItem
+class PLATFORM_MAKE_PRIVATE FilterValueModel : public QSortFilterProxyModel
 {
+    PLATFORM_MAKE_NONCOPYABLE(FilterValueModel)
+
 public:
-    CompositeValueRealPathItem(const EntityValue &value, Model::Item *parent = 0);
+    FilterValueModel(QObject *parent = 0);
 
-    /* Base */
-    virtual QVariant data(qint32 column, qint32 role) const;
+    void setFilter(const QString &filter);
 
-    /* CompositeValuePathItem */
-    virtual QString fileName() const;
-    virtual bool isFile() const;
-    virtual void open() const;
+protected:
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
+
+private:
+    QByteArray m_filter;
 };
 
 }}
 
-#endif /* LVFS_DB_COMPOSITEVALUEREALPATHITEM_H_ */
+#endif /* LVFS_DB_FILTERVALUEMODEL_H_ */

@@ -26,8 +26,8 @@
 #include <lvfs-core/tools/events/MouseEventHandler>
 #include <lvfs-core/tools/events/MouseEventSource>
 #include <lvfs-core/tools/widgets/NestedWidget>
-#include "../../model/lvfs_db_CompositeValueModel.h"
-#include "../../model/lvfs_db_CompositeValueDelegate.h"
+#include "../../../../model/lvfs_db_ValueModel.h"
+#include "../../../../model/lvfs_db_ValueDelegate.h"
 
 
 using namespace ::LVFS;
@@ -56,7 +56,7 @@ public:
 
 public:
     CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value);
-    CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files);
+    CompositeValueWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files);
 
     const Interface::Adaptor<IStorage> &container() const { return m_container; }
     Interface::Adaptor<IStorage> &container() { return m_container; }
@@ -64,8 +64,8 @@ public:
     const TreeView &view() const { return m_view; }
     TreeView &view() { return m_view; }
 
-    const CompositeValueModel &model() const { return m_model; }
-    CompositeValueModel &model() { return m_model; }
+    const ValueModel &model() const { return m_model; }
+    ValueModel &model() { return m_model; }
 
     void open(const QModelIndex &index);
     void addValue(const QModelIndex &index);
@@ -76,8 +76,8 @@ private:
     Interface::Adaptor<IStorage> m_container;
     EntityValue m_value;
     TreeView m_view;
-    CompositeValueModel m_model;
-    CompositeValueDelegate m_delegate;
+    ValueModel m_model;
+    ValueDelegate m_delegate;
 };
 
 
@@ -85,7 +85,7 @@ class PLATFORM_MAKE_PRIVATE MainCompositeValueWidget : public BaseNestedWidget, 
 {
 public:
     MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, NestedDialog *parent);
-    MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const CompositeValueModel::Files &files, NestedDialog *parent);
+    MainCompositeValueWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, NestedDialog *parent);
 
     /* BaseNestedWidget */
     virtual QWidget *centralWidget();
@@ -101,8 +101,8 @@ public:
     const Interface::Adaptor<IStorage> &container() const { return m_private.container(); }
     Interface::Adaptor<IStorage> &container() { return m_private.container(); }
 
-    const CompositeValueModel &model() const { return m_private.model(); }
-    CompositeValueModel &model() { return m_private.model(); }
+    const ValueModel &model() const { return m_private.model(); }
+    ValueModel &model() { return m_private.model(); }
 
     void open(const QModelIndex &index) { m_private.open(index); }
     void edit(const QModelIndex &index) { m_private.view().edit(index); }
@@ -132,8 +132,8 @@ public:
     const Interface::Adaptor<IStorage> &container() const { return m_private.container(); }
     Interface::Adaptor<IStorage> &container() { return m_private.container(); }
 
-    const CompositeValueModel &model() const { return m_private.model(); }
-    CompositeValueModel &model() { return m_private.model(); }
+    const ValueModel &model() const { return m_private.model(); }
+    ValueModel &model() { return m_private.model(); }
 
     void addValue();
     void removeValue();

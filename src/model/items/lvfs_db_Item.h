@@ -17,33 +17,28 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_
-#define WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_
+#ifndef LVFS_DB_ITEM_H_
+#define LVFS_DB_ITEM_H_
 
-#include <lvfs/IEntry>
+#include <liquiddb/EntityValue>
+#include "../lvfs_db_Model.h"
+#include "../../lvfs_db_common.h"
 
 
 namespace LVFS {
 namespace Db {
 
-class PLATFORM_MAKE_PRIVATE InvalidFile : public Implements<IEntry>
+class PLATFORM_MAKE_PRIVATE Item : public Model::ListItem
 {
 public:
-    InvalidFile(const char *file);
-    virtual ~InvalidFile();
+    Item(Item *parent = 0);
+    virtual ~Item();
 
-public: /* IEntry */
-    virtual const char *title() const;
-    virtual const char *schema() const;
-    virtual const char *location() const;
-    virtual const IType *type() const;
-    virtual Interface::Holder open(IFile::Mode mode) const;
-
-private:
-    char *m_title;
-    Interface::Holder m_type;
+    virtual bool isPath() const;
+    virtual bool isValue() const;
+    virtual bool isProperty() const;
 };
 
 }}
 
-#endif /* WORKSPACE_LVFS_DB_SRC_NODES_QUERY_LVFS_DB_INVALIDFILE_H_ */
+#endif /* LVFS_DB_ITEM_H_ */
