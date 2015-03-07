@@ -32,6 +32,7 @@
 #include <lvfs-core/tools/widgets/NestedWidget>
 #include "../model/lvfs_db_EditableValueListModel.h"
 #include "../../../../../model/lvfs_db_FilterValueModel.h"
+#include "../../../../../model/items/lvfs_db_Item.h"
 
 
 using namespace ::LVFS;
@@ -91,6 +92,7 @@ public:
     FilterValueModel &proxy() { return m_proxy; }
 
     QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
+    void setCurrentIndex(Item *item) { m_view.setCurrentIndex(m_proxy.mapFromSource(m_model.index(m_model.indexOf(item), 0))); }
 
     void addValue();
     void removeValue();
@@ -144,6 +146,8 @@ public:
     const Entity &entity() const { return m_private.entity(); }
 
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
+    void setCurrentIndex(Item *item) { m_private.setCurrentIndex(item); }
+
     EntityValue takeValue() { return m_private.model().take(currentIndex()); }
 
     void closeDbContext() { m_private.model().close(); }

@@ -31,6 +31,7 @@ class PLATFORM_MAKE_PRIVATE EditableValueListModel : public ListValueModel
 public:
     EditableValueListModel(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QObject *parent = 0);
 
+    using ListValueModel::indexOf;
     QModelIndex add(const EntityValue &value);
 };
 

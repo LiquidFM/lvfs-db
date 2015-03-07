@@ -38,6 +38,8 @@ public:
 protected:
     EntityValue takeValue();
     QModelIndex currentIndex() const;
+    void setCurrentIndex(Item *item);
+
     virtual void dblClick();
 
 private:

@@ -67,6 +67,11 @@ QModelIndex EditableValueListDialog::currentIndex() const
     return m_widget.currentIndex();
 }
 
+void EditableValueListDialog::setCurrentIndex(Item *item)
+{
+    m_widget.setCurrentIndex(item);
+}
+
 void EditableValueListDialog::dblClick()
 {
     QModelIndex index = currentIndex();

@@ -37,6 +37,7 @@ public:
 
 protected:
     QModelIndex currentIndex() const;
+    void setCurrentIndex(Item *item);
 
 private:
     typedef MouseDoubleClickEventHandler<

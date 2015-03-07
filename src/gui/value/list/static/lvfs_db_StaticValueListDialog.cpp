@@ -18,7 +18,7 @@
  */
 
 #include "lvfs_db_StaticValueListDialog.h"
-#include "../../../../lvfs_db_common.h"
+#include "../../../../model/items/lvfs_db_FileItem.h"
 
 
 StaticValueListDialog::StaticValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
@@ -52,15 +52,40 @@ EntityValue StaticValueListDialog::takeValue()
 
 void StaticValueListDialog::accept()
 {
-    if (currentIndex().isValid())
-        QDialog::accept();
+    QModelIndex index = currentIndex();
+
+    if (index.isValid())
+    {
+        Item *item = static_cast<Item *>(index.internalPointer());
+
+        if (item->isPath() && item->parent() != NULL)
+            static_cast<FileItem *>(item)->open();
+        else
+        {
+            if (item->parent())
+            {
+                do
+                    item = static_cast<Item *>(item->parent());
+                while (item->parent());
+
+                setCurrentIndex(item);
+            }
+
+            NestedPlainDialog::accept();
+        }
+    }
     else
-        warning(windowTitle(), tr("You must select a value."));
+        warning(tr("You must choose one of the values."));
 }
 
 QModelIndex StaticValueListDialog::currentIndex() const
 {
     return m_widget.currentIndex();
+}
+
+void StaticValueListDialog::setCurrentIndex(Item *item)
+{
+    m_widget.setCurrentIndex(item);
 }
 
 void StaticValueListDialog::setFocusToFilter()

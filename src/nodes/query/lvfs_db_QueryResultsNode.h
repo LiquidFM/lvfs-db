@@ -20,14 +20,10 @@
 #ifndef LVFS_DB_QUERYRESULTSNODE_H_
 #define LVFS_DB_QUERYRESULTSNODE_H_
 
-#include <efc/Vector>
 #include <lvfs-db/IStorage>
-#include <lvfs-core/INode>
 #include <lvfs-core/models/Node>
-#include <lvfs-core/tools/models/TreeModel>
-#include <liquiddb/EntityValueReader>
-//#include "items/lvfs_db_RootNodeItem.h"
 #include "../../lvfs_db_INode.h"
+#include "../../model/lvfs_db_ListValueModel.h"
 
 
 namespace LVFS {
@@ -36,24 +32,19 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE QueryResultsNode : public Core::Tools::TreeModel, public Complements<Core::Node, Db::INode>
+class PLATFORM_MAKE_PRIVATE QueryResultsNode : public ListValueModel, public Complements<Core::Node, Db::INode>
 {
 public:
-    QueryResultsNode(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, const Interface::Holder &parent);
+    QueryResultsNode(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, const Interface::Holder &parent);
     virtual ~QueryResultsNode();
-
-public: /* Core::Tools::TreeModel */
-    virtual void fetchMore(const QModelIndex &parent);
-    virtual bool canFetchMore(const QModelIndex &parent = QModelIndex()) const;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
 
 public: /* Core::INode */
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
-    virtual void accept(const Interface::Holder &view, Files &files);
-    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move = false);
-    virtual void remove(const Interface::Holder &view, Files &files);
+    virtual void accept(const Interface::Holder &view, Core::INode::Files &files);
+    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Core::INode::Files &files, bool move = false);
+    virtual void remove(const Interface::Holder &view, Core::INode::Files &files);
 
     virtual void clear();
 
@@ -71,19 +62,6 @@ public: /* Db::INode */
 
     virtual Interface::Holder search(const QModelIndex &file, const Interface::Holder &view);
     virtual Interface::Holder activated(const QModelIndex &file, const Interface::Holder &view);
-
-protected: /* Core::Tools::TreeModel */
-    virtual size_type size() const;
-    virtual Item *at(size_type index) const;
-    virtual size_type indexOf(Item *item) const;
-
-private:
-    enum { PrefetchLimit = 64 };
-
-private:
-    Interface::Adaptor<IStorage> m_container;
-    EntityValueReader m_reader;
-    EFC::Vector<Item *> m_items;
 
 private:
     Geometry m_geometry;

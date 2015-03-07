@@ -51,8 +51,8 @@ protected:
     enum { PrefetchLimit = 64 };
 
 protected:
-    EntityValueReader m_reader;
     const Interface::Adaptor<IStorage> &m_storage;
+    EntityValueReader m_reader;
 };
 
 }}

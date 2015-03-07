@@ -36,7 +36,18 @@ void SelectableValueListDialog::dblClick()
         if (item->isPath() && item->parent() != NULL)
             static_cast<FileItem *>(item)->open();
         else
+        {
+            if (item->parent())
+            {
+                do
+                    item = static_cast<Item *>(item->parent());
+                while (item->parent());
+
+                setCurrentIndex(item);
+            }
+
             accept();
+        }
     }
     else
         warning(tr("You must choose one of the values."));

@@ -18,9 +18,8 @@
  */
 
 #include "lvfs_db_QueryResultsNode.h"
-
-#include "items/lvfs_db_QueryResultCompositeRootItem.h"
-#include "items/lvfs_db_QueryResultPathItem.h"
+#include "../../model/items/lvfs_db_FileItem.h"
+#include "../../model/items/lvfs_db_PropertyItem.h"
 
 #include <lvfs-core/models/Qt/IView>
 
@@ -31,22 +30,17 @@ namespace Db {
 using namespace LiquidDb;
 
 
-QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, const Interface::Holder &parent) :
-    Complements<Core::Node, Db::INode>(container.interface(), parent),
-    m_container(container),
-    m_reader(reader),
+QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, const Interface::Holder &parent) :
+    ListValueModel(storage, reader),
+    Complements(storage.interface(), parent),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
 {
-    ASSERT(m_reader.isValid());
     ASSERT(m_sorting.first < columnCount(QModelIndex()));
 }
 
 QueryResultsNode::~QueryResultsNode()
-{
-    for (auto i : m_items)
-        delete i;
-}
+{}
 
 void QueryResultsNode::refresh(int depth)
 {
@@ -63,17 +57,17 @@ void QueryResultsNode::closed(const Interface::Holder &view)
 
 }
 
-void QueryResultsNode::accept(const Interface::Holder &view, Files &files)
+void QueryResultsNode::accept(const Interface::Holder &view, Core::INode::Files &files)
 {
     files.clear();
 }
 
-void QueryResultsNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)
+void QueryResultsNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Core::INode::Files &files, bool move)
 {
     ASSERT(!"Should not be reached!");
 }
 
-void QueryResultsNode::remove(const Interface::Holder &view, Files &files)
+void QueryResultsNode::remove(const Interface::Holder &view, Core::INode::Files &files)
 {
 
 }
@@ -90,48 +84,6 @@ Interface::Holder QueryResultsNode::node(const Interface::Holder &file) const
 
 void QueryResultsNode::setNode(const Interface::Holder &file, const Interface::Holder &node)
 {}
-
-void QueryResultsNode::fetchMore(const QModelIndex &parent)
-{
-    EntityValue item;
-    EFC::Vector<Item *> list;
-    EFC::List<Interface::Holder> files;
-
-    list.reserve(PrefetchLimit);
-
-    if (m_reader.entity().type() == Entity::Composite)
-        for (int actualLimit = 0; actualLimit < PrefetchLimit; ++actualLimit)
-            if ((item = m_reader.next()).isValid())
-                list.push_back(new QueryResultCompositeRootItem(files, m_container, item));
-            else
-                break;
-    else
-        for (int actualLimit = 0; actualLimit < PrefetchLimit; ++actualLimit)
-            if ((item = m_reader.next()).isValid())
-                list.push_back(new QueryResultRootItem(item));
-            else
-                break;
-
-    if (!list.empty())
-    {
-//        if (!files.empty())
-//            handleTask(new ScanFilesTask(ModelEvent::UpdateFiles, this, files));
-
-        beginInsertRows(parent, m_items.size(), m_items.size() + list.size() - 1);
-        m_items.insert(m_items.begin(), list.begin(), list.end());
-        endInsertRows();
-    }
-}
-
-bool QueryResultsNode::canFetchMore(const QModelIndex &parent) const
-{
-    return !parent.isValid() && !m_reader.eof();
-}
-
-Qt::ItemFlags QueryResultsNode::flags(const QModelIndex &index) const
-{
-    return Qt::ItemIsSelectable | Qt::ItemIsEditable | Qt::ItemIsEnabled;
-}
 
 QAbstractItemModel *QueryResultsNode::model() const
 {
@@ -165,42 +117,23 @@ Interface::Holder QueryResultsNode::search(const QModelIndex &file, const Interf
 
 Interface::Holder QueryResultsNode::activated(const QModelIndex &file, const Interface::Holder &view)
 {
-    QueryResultItem *item = static_cast<QueryResultItem *>(file.internalPointer());
+    Db::Item *item = static_cast<Db::Item *>(file.internalPointer());
 
     if (item != NULL)
         if (item->isPath())
-            static_cast<QueryResultPathItem *>(item)->open();
+            static_cast<FileItem *>(item)->open();
         else
-            if (item->isRoot() && static_cast<QueryResultRootItem *>(item)->value().entity().type() == Entity::Composite)
+            if (item->parent() == NULL && m_reader.entity().type() == Entity::Composite)
             {
-                for (int i = 0, size = static_cast<QueryResultCompositeRootItem *>(item)->size(); i < size; ++i)
-                    if (static_cast<QueryResultItem *>(static_cast<QueryResultCompositeRootItem *>(item)->at(i))->isPathProperty())
+                for (int i = 0, size = item->size(); i < size; ++i)
+                    if (m_storage->schema(static_cast<PropertyItem *>(static_cast<Db::Item *>(item)->at(i))->entity()) == IStorage::Path)
                     {
-                        view->as<Core::Qt::IView>()->select(index(static_cast<QueryResultCompositeRootItem *>(item)->at(i)), true);
+                        view->as<Core::Qt::IView>()->select(index(static_cast<Db::Item *>(item)->at(i)), true);
                         break;
                     }
             }
 
     return Interface::Holder();
-}
-
-QueryResultsNode::size_type QueryResultsNode::size() const
-{
-    return m_items.size();
-}
-
-QueryResultsNode::Item *QueryResultsNode::at(size_type index) const
-{
-    return m_items.at(index);
-}
-
-QueryResultsNode::size_type QueryResultsNode::indexOf(Item *item) const
-{
-    for (auto i = m_items.begin(), end = m_items.end(); i != end; ++i)
-        if (*i == item)
-            return i - m_items.begin();
-
-    return InvalidIndex;
 }
 
 }}

@@ -26,8 +26,8 @@ namespace Db {
 
 ListValueModel::ListValueModel(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QObject *parent) :
     ValueModel(parent),
-    m_reader(reader),
-    m_storage(storage)
+    m_storage(storage),
+    m_reader(reader)
 {}
 
 QVariant ListValueModel::headerData(int section, Qt::Orientation orientation, int role) const
