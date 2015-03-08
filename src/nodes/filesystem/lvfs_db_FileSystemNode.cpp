@@ -167,21 +167,6 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
     files.clear();
 }
 
-void FileSystemNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)
-{
-    m_node->copy(view, dest, files, move);
-}
-
-void FileSystemNode::remove(const Interface::Holder &view, Files &files)
-{
-    m_node->remove(view, files);
-}
-
-void FileSystemNode::cancel(const Files &files)
-{
-    m_node->cancel(files);
-}
-
 int FileSystemNode::refs() const
 {
     return m_node->refs();

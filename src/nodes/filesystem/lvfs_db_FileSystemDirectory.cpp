@@ -124,7 +124,12 @@ bool FileSystemDirectory::exists(const char *name) const
 
 Interface::Holder FileSystemDirectory::entry(const char *name, const IType *type, bool create)
 {
-    return m_file->entry(name, type, create);
+    Interface::Holder entry(m_file->entry(name, type, create));
+
+    if (entry.isValid() && type && ::strcmp(type->name(), Module::DirectoryTypeName) == 0)
+        return Interface::Holder(new (std::nothrow) Db::FileSystemDirectory(m_storage, entry));
+
+    return entry;
 }
 
 bool FileSystemDirectory::copy(const Progress &callback, const Interface::Holder &file, bool move)

@@ -43,11 +43,7 @@ public: /* Core::INode */
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
-
     virtual void accept(const Interface::Holder &view, Files &files);
-    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move = false);
-    virtual void remove(const Interface::Holder &view, Files &files);
-    virtual void cancel(const Files &files);
 
     virtual int refs() const;
     virtual void incRef();
