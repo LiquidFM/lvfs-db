@@ -43,8 +43,6 @@ public: /* Core::INode */
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
     virtual void accept(const Interface::Holder &view, Core::INode::Files &files);
-    virtual void copy(const Interface::Holder &view, const Interface::Holder &dest, Core::INode::Files &files, bool move = false);
-    virtual void remove(const Interface::Holder &view, Core::INode::Files &files);
 
     virtual void clear();
 
@@ -60,8 +58,10 @@ public: /* Db::INode */
     virtual QModelIndex currentIndex() const;
     virtual void setCurrentIndex(const QModelIndex &index);
 
-    virtual Interface::Holder search(const QModelIndex &file, const Interface::Holder &view);
-    virtual Interface::Holder activated(const QModelIndex &file, const Interface::Holder &view);
+    virtual Interface::Holder activated(const Interface::Holder &view, const QModelIndex &index);
+    virtual Interface::Holder search(const Interface::Holder &view, const QModelIndex &index);
+    virtual void insert(const Interface::Holder &view, const QModelIndex &index);
+    virtual void remove(const Interface::Holder &view, const QModelIndex &index);
 
 private:
     Geometry m_geometry;

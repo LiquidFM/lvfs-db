@@ -19,9 +19,16 @@
 
 #include "lvfs_db_QueryResultsNode.h"
 #include "../../model/items/lvfs_db_FileItem.h"
+#include "../../model/items/lvfs_db_ValueItem.h"
 #include "../../model/items/lvfs_db_PropertyItem.h"
 
+#include "../../gui/value/list/selectable/lvfs_db_SelectableValueListDialog.h"
+#include "../../lvfs_db_common.h"
+
+#include <lvfs-core/IView>
 #include <lvfs-core/models/Qt/IView>
+
+#include <QtGui/QMessageBox>
 
 
 namespace LVFS {
@@ -62,16 +69,6 @@ void QueryResultsNode::accept(const Interface::Holder &view, Core::INode::Files 
     files.clear();
 }
 
-void QueryResultsNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Core::INode::Files &files, bool move)
-{
-    ASSERT(!"Should not be reached!");
-}
-
-void QueryResultsNode::remove(const Interface::Holder &view, Core::INode::Files &files)
-{
-
-}
-
 void QueryResultsNode::clear()
 {
 
@@ -110,30 +107,112 @@ void QueryResultsNode::setCurrentIndex(const QModelIndex &index)
     m_currentIndex = index;
 }
 
-Interface::Holder QueryResultsNode::search(const QModelIndex &file, const Interface::Holder &view)
+Interface::Holder QueryResultsNode::activated(const Interface::Holder &view, const QModelIndex &index)
+{
+    ASSERT(index.isValid());
+    Db::Item *item = static_cast<Db::Item *>(index.internalPointer());
+
+    if (item->isPath())
+        static_cast<FileItem *>(item)->open();
+    else
+        if (item->parent() == NULL && m_reader.entity().type() == Entity::Composite)
+        {
+            for (int i = 0, size = item->size(); i < size; ++i)
+                if (m_storage->schema(static_cast<PropertyItem *>(item->at(i))->entity()) == IStorage::Path)
+                {
+                    view->as<Core::Qt::IView>()->select(this->index(item->at(i)), true);
+                    break;
+                }
+        }
+
+    return Interface::Holder();
+}
+
+Interface::Holder QueryResultsNode::search(const Interface::Holder &view, const QModelIndex &index)
 {
     return Interface::Holder();
 }
 
-Interface::Holder QueryResultsNode::activated(const QModelIndex &file, const Interface::Holder &view)
+void QueryResultsNode::insert(const Interface::Holder &view, const QModelIndex &index)
 {
-    Db::Item *item = static_cast<Db::Item *>(file.internalPointer());
+    ASSERT(index.isValid());
+    Db::Item *item = static_cast<Db::Item *>(index.internalPointer());
 
-    if (item != NULL)
-        if (item->isPath())
-            static_cast<FileItem *>(item)->open();
-        else
-            if (item->parent() == NULL && m_reader.entity().type() == Entity::Composite)
+    if (item->isProperty() && m_storage->schema(static_cast<PropertyItem *>(item)->entity()) != IStorage::Path)
+    {
+        PropertyItem *property = static_cast<PropertyItem *>(item);
+
+        if (m_storage->transaction())
+        {
+            EntityValueReader reader(m_storage->entityValues(property->entity()));
+            SelectableValueListDialog dialog(m_storage, reader, view->as<Core::IView>()->widget());
+
+            if (dialog.exec() == SelectableValueListDialog::Accepted)
             {
-                for (int i = 0, size = item->size(); i < size; ++i)
-                    if (m_storage->schema(static_cast<PropertyItem *>(static_cast<Db::Item *>(item)->at(i))->entity()) == IStorage::Path)
+                EntityValue value = dialog.takeValue();
+
+                if (m_storage->addValue(static_cast<ValueItem *>(property->parent())->value(), value))
+                    if (m_storage->commit())
                     {
-                        view->as<Core::Qt::IView>()->select(index(static_cast<Db::Item *>(item)->at(i)), true);
-                        break;
+                        beginInsertRows(index, property->size(), property->size());
+                        property->add(value);
+                        endInsertRows();
                     }
+                    else
+                    {
+                        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                        m_storage->rollback();
+                    }
+                else
+                {
+                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                    m_storage->rollback();
+                }
+            }
+            else
+                m_storage->rollback();
+        }
+        else
+            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+    }
+}
+
+void QueryResultsNode::remove(const Interface::Holder &view, const QModelIndex &index)
+{
+    ASSERT(index.isValid());
+    Db::Item *item = static_cast<Db::Item *>(index.internalPointer());
+
+    if (item->isValue() && m_storage->schema(static_cast<ValueItem *>(item)->value().entity()) != IStorage::Path)
+    {
+        if (m_storage->transaction())
+        {
+            ValueItem *valueItem = static_cast<ValueItem *>(item);
+            PropertyItem *property = static_cast<PropertyItem *>(valueItem->parent());
+
+            if (m_storage->removeValue(static_cast<ValueItem *>(property->parent())->value(), valueItem->value()))
+            {
+                PropertyItem::size_type idx = property->indexOf(valueItem);
+
+                beginRemoveRows(ListValueModel::parent(index), idx, idx);
+                property->remove(idx);
+                endRemoveRows();
+            }
+            else
+            {
+                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                m_storage->rollback();
+                return;
             }
 
-    return Interface::Holder();
+            if (!m_storage->commit())
+            {
+                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                m_storage->rollback();
+            }
+        }
+        else
+            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+    }
 }
 
 }}

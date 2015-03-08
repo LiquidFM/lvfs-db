@@ -167,44 +167,11 @@ void RootNode::setCurrentIndex(const QModelIndex &index)
     m_currentIndex = index;
 }
 
-Interface::Holder RootNode::search(const QModelIndex &file, const Interface::Holder &view)
-{
-    if (static_cast<RootNodeItem *>(file.internalPointer())->isEntity())
-    {
-        RootNodeEntityItem *item = static_cast<RootNodeEntityItem *>(file.internalPointer());
-
-        if (item->entity().type() == Entity::Composite)
-            if (m_container->transaction())
-            {
-                CreateQueryDialog dialog(m_container, item->entity(), view->as<Core::IView>()->widget());
-
-                if (dialog.exec() == CreateQueryDialog::Accepted)
-                {
-                    EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
-
-                    if (reader.isValid() && m_container->commit())
-                        return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
-                    else
-                    {
-                        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
-                        m_container->rollback();
-                    }
-                }
-                else
-                    m_container->rollback();
-            }
-            else
-                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
-    }
-
-    return Interface::Holder();
-}
-
-Interface::Holder RootNode::activated(const QModelIndex &file, const Interface::Holder &view)
+Interface::Holder RootNode::activated(const Interface::Holder &view, const QModelIndex &index)
 {
     RootNodeItem *item;
 
-    if ((item = static_cast<RootNodeItem *>(file.internalPointer()))->isEntity())
+    if ((item = static_cast<RootNodeItem *>(index.internalPointer()))->isEntity())
         if (m_container->transaction())
         {
             EntityValueReader reader(m_container->entityValues(static_cast<RootNodeEntityItem *>(item)->entity()));
@@ -240,6 +207,49 @@ Interface::Holder RootNode::activated(const QModelIndex &file, const Interface::
         }
 
     return Interface::Holder();
+}
+
+Interface::Holder RootNode::search(const Interface::Holder &view, const QModelIndex &index)
+{
+    if (static_cast<RootNodeItem *>(index.internalPointer())->isEntity())
+    {
+        RootNodeEntityItem *item = static_cast<RootNodeEntityItem *>(index.internalPointer());
+
+        if (item->entity().type() == Entity::Composite)
+            if (m_container->transaction())
+            {
+                CreateQueryDialog dialog(m_container, item->entity(), view->as<Core::IView>()->widget());
+
+                if (dialog.exec() == CreateQueryDialog::Accepted)
+                {
+                    EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
+
+                    if (reader.isValid() && m_container->commit())
+                        return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
+                    else
+                    {
+                        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
+                        m_container->rollback();
+                    }
+                }
+                else
+                    m_container->rollback();
+            }
+            else
+                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
+    }
+
+    return Interface::Holder();
+}
+
+void RootNode::insert(const Interface::Holder &view, const QModelIndex &index)
+{
+
+}
+
+void RootNode::remove(const Interface::Holder &view, const QModelIndex &index)
+{
+
 }
 
 RootNode::size_type RootNode::size() const

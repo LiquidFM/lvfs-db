@@ -44,11 +44,13 @@ public:
     const QString &name() const { return m_name; }
     void setName(const QString &value) { m_property.name = fromUnicode(m_name = value).data(); }
 
+    void add(const EntityValue &value);
+    void remove(size_type index) { Container::iterator i = m_items.begin() + index; delete (*i); m_items.erase(i); }
+
 protected:
     friend class ValueModel;
     friend class ValueItem;
     void add(Item *item) { m_items.push_back(item); }
-    void remove(size_type index) { Container::iterator i = m_items.begin() + index; delete (*i); m_items.erase(i); }
 
 private:
     Entity::Property m_property;

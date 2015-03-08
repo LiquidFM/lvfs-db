@@ -60,6 +60,7 @@ private:
     void createFileShortcut();
     void removeShortcut();
     void searchShortcut();
+    void insertShortcut();
 
 private:
     typedef Tools::MouseDoubleClickEventSource<

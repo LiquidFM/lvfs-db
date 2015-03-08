@@ -18,6 +18,7 @@
  */
 
 #include "lvfs_db_PropertyItem.h"
+#include "lvfs_db_ValueItem.h"
 
 
 namespace LVFS {
@@ -43,6 +44,11 @@ QVariant PropertyItem::data(qint32 column, qint32 role) const
 bool PropertyItem::isProperty() const
 {
     return true;
+}
+
+void PropertyItem::add(const EntityValue &value)
+{
+    m_items.push_back(new ValueItem(value, this));
 }
 
 }}

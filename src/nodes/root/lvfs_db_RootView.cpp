@@ -45,8 +45,9 @@ RootView::RootView() :
     m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Backspace, &RootView::goUpShortcut);
     m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F2,        &RootView::renameShortcut);
     m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F8,        &RootView::createFileShortcut);
-    m_eventHandler.registerShortcut(::Qt::SHIFT,      ::Qt::Key_Delete,    &RootView::removeShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Delete,    &RootView::removeShortcut);
     m_eventHandler.registerShortcut(::Qt::CTRL,       ::Qt::Key_F,         &RootView::searchShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Insert,    &RootView::insertShortcut);
 }
 
 RootView::~RootView()
@@ -129,10 +130,10 @@ void RootView::goIntoShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->activated(index, Interface::Holder::fromRawData(this));
+        Interface::Holder newNode = m_node->as<Db::INode>()->activated(Interface::Holder::fromRawData(this), index);
 
         if (newNode.isValid())
-            m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
+            m_mainView->as<Core::IMainView>()->show(newNode, Interface::Holder::fromRawData(this));
     }
 }
 
@@ -148,7 +149,10 @@ void RootView::createFileShortcut()
 
 void RootView::removeShortcut()
 {
+    QModelIndex index = m_view.selectionModel()->currentIndex();
 
+    if (index.isValid())
+        m_node->as<Db::INode>()->remove(Interface::Holder::fromRawData(this), index);
 }
 
 void RootView::searchShortcut()
@@ -157,11 +161,19 @@ void RootView::searchShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->search(index, Interface::Holder::fromRawData(this));
+        Interface::Holder newNode = m_node->as<Db::INode>()->search(Interface::Holder::fromRawData(this), index);
 
         if (newNode.isValid())
             m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
     }
+}
+
+void RootView::insertShortcut()
+{
+    QModelIndex index = m_view.selectionModel()->currentIndex();
+
+    if (index.isValid())
+        m_node->as<Db::INode>()->insert(Interface::Holder::fromRawData(this), index);
 }
 
 }}
