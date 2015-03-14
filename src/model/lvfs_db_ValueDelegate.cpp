@@ -22,7 +22,7 @@
 #include "items/lvfs_db_FileItem.h"
 #include "items/lvfs_db_ValueItem.h"
 #include "items/lvfs_db_PropertyItem.h"
-#include "../gui/value/edit/lvfs_db_EditCompositeValueDialog.h"
+#include "../gui/value/lvfs_db_EntityValueDialog.h"
 
 #include <lvfs-core/tools/widgets/ValueDialog>
 #include <QtGui/QMessageBox>
@@ -73,9 +73,9 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
             {
                 if (m_storage->transaction())
                 {
-                    EditCompositeValueDialog dialog(m_storage, item->value(), parent);
+                    EntityValueDialog dialog(m_storage, item->value(), parent);
 
-                    if (dialog.exec() != EditCompositeValueDialog::Accepted)
+                    if (dialog.exec() != EntityValueDialog::Accepted)
                         m_storage->rollback();
                     else
                         if (m_storage->commit())

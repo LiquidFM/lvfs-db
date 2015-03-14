@@ -20,7 +20,7 @@
 #include "lvfs_db_FileSystemNode.h"
 #include "../../model/lvfs_db_ValueModel.h"
 #include "../../gui/choose/lvfs_db_ChooseEntityDialog.h"
-#include "../../gui/value/new/file/lvfs_db_NewFileValueDialog.h"
+#include "../../gui/value/lvfs_db_EntityValueDialog.h"
 #include "../../lvfs_db_common.h"
 
 #include <lvfs/Module>
@@ -136,9 +136,9 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
 
                 if (m_storage->addValue(value, list))
                 {
-                    NewFileValueDialog dialog(m_storage, value, dbFiles, view->as<Core::IView>()->widget());
+                    EntityValueDialog dialog(m_storage, value, dbFiles, view->as<Core::IView>()->widget());
 
-                    if (dialog.exec() != NewFileValueDialog::Accepted)
+                    if (dialog.exec() != EntityValueDialog::Accepted)
                         m_storage->rollback();
                     else
                         if (m_storage->commit())

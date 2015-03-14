@@ -86,27 +86,17 @@ public:
     ValueWidgetPrivate(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, ICallback *callback, EventHandler *handler);
     ValueWidgetPrivate(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, ICallback *callback, EventHandler *handler);
 
-    const Interface::Adaptor<IStorage> &storage() const { return m_storage; }
-    Interface::Adaptor<IStorage> &storage() { return m_storage; }
-
-    const Entity &entity() const { return m_entity; }
-
     const TreeView &view() const { return m_view; }
     TreeView &view() { return m_view; }
 
-    const FilterValueModel &proxy() const { return m_proxy; }
-    FilterValueModel &proxy() { return m_proxy; }
-
-    const ValueModel &model() const { return m_model; }
-    ValueModel &model() { return m_model; }
-
+    const Entity &entity() const { return m_entity; }
     QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
-    void setCurrentIndex(Item *item);
 
-    void edit() { m_view.edit(currentIndex()); }
+    void edit();
+    bool dblClick();
     void addValue();
     void removeValue();
-    void setFocusToFilter() { m_filter.setFocus(); }
+    void setFocusToFilter();
 
 private:
     void doAddValue();
@@ -162,20 +152,11 @@ public:
     virtual NestedDialog *parent();
     virtual void critical(const QString &text);
 
-    const Interface::Adaptor<IStorage> &storage() const { return m_private.storage(); }
-    Interface::Adaptor<IStorage> &storage() { return m_private.storage(); }
-
     const Entity &entity() const { return m_private.entity(); }
-
-    const ValueModel &model() const { return m_private.model(); }
-    ValueModel &model() { return m_private.model(); }
-
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
-    void setCurrentIndex(Item *item) { m_private.setCurrentIndex(item); }
-
-    EntityValue takeValue() { return m_private.model().take(currentIndex()); }
 
     void edit() { m_private.edit(); }
+    bool dblClick() { return m_private.dblClick(); }
     void addValue() { m_private.addValue(); }
     void removeValue() { m_private.removeValue(); }
     void setFocusToFilter() { m_private.setFocusToFilter(); }
@@ -201,16 +182,11 @@ public:
     virtual NestedDialog *parent();
     virtual void critical(const QString &text);
 
-    const Interface::Adaptor<IStorage> &storage() const { return m_private.storage(); }
-    Interface::Adaptor<IStorage> &storage() { return m_private.storage(); }
-
-    const ValueModel &model() const { return m_private.model(); }
-    ValueModel &model() { return m_private.model(); }
-
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
 
-    EntityValue takeValue() { return m_private.model().take(currentIndex()); }
-
+private:
+    void edit();
+    bool dblClick();
     void addValue();
     void removeValue();
     void setFocusToFilter();
@@ -219,10 +195,13 @@ private:
     void init();
 
 private:
-    typedef KeyboardEventHandler<
-                EventHandlerBase<
-                    ValueWidget
-                >
+    typedef MouseDoubleClickEventHandler<
+                KeyboardEventHandler<
+                    EventHandlerBase<
+                        ValueWidget
+                    >
+                >,
+                Templates::bool_value<false>
             > TreeViewHandler;
 
 private:

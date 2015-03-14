@@ -22,7 +22,7 @@
 #include "../../model/items/lvfs_db_ValueItem.h"
 #include "../../model/items/lvfs_db_PropertyItem.h"
 
-#include "../../gui/value/list/selectable/lvfs_db_SelectableValueListDialog.h"
+#include "../../gui/value/lvfs_db_SelectValueDialog.h"
 #include "../../lvfs_db_common.h"
 
 #include <lvfs-core/IView>
@@ -145,11 +145,11 @@ void QueryResultsNode::insert(const Interface::Holder &view, const QModelIndex &
         if (m_storage->transaction())
         {
             EntityValueReader reader(m_storage->entityValues(property->entity()));
-            SelectableValueListDialog dialog(m_storage, reader, view->as<Core::IView>()->widget());
+            SelectValueDialog dialog(m_storage, reader, view->as<Core::IView>()->widget());
 
-            if (dialog.exec() == SelectableValueListDialog::Accepted)
+            if (dialog.exec() == SelectValueDialog::Accepted)
             {
-                EntityValue value = dialog.takeValue();
+                EntityValue value = dialog.value();
 
                 if (m_storage->addValue(static_cast<ValueItem *>(property->parent())->value(), value))
                     if (m_storage->commit())

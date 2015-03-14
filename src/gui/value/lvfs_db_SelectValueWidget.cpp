@@ -17,38 +17,35 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_SelectableValueListDialog.h"
-#include "../../../../model/items/lvfs_db_FileItem.h"
+#include "lvfs_db_SelectValueWidget.h"
+#include "../../model/items/lvfs_db_ValueItem.h"
+
+#include <brolly/assert.h>
 
 
-SelectableValueListDialog::SelectableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
-    EditableValueListDialog(container, reader, parent)
+SelectValueWidget::SelectValueWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent) :
+    ValueWidget(container, reader, parent, QString())
 {}
 
-void SelectableValueListDialog::dblClick()
+EntityValue SelectValueWidget::value()
 {
     QModelIndex index = currentIndex();
+    ASSERT(index.isValid());
 
-    if (index.isValid())
-    {
-        Item *item = static_cast<Item *>(index.internalPointer());
+    Item *item = static_cast<Item *>(index.internalPointer());
 
-        if (item->isPath() && item->parent() != NULL)
-            static_cast<FileItem *>(item)->open();
-        else
-        {
-            if (item->parent())
-            {
-                do
-                    item = static_cast<Item *>(item->parent());
-                while (item->parent());
+    if (item->parent())
+        do
+            item = item->parent();
+        while (item->parent());
 
-                setCurrentIndex(item);
-            }
+    return static_cast<ValueItem *>(item)->value();
+}
 
-            accept();
-        }
-    }
+void SelectValueWidget::accept()
+{
+    if (currentIndex().isValid())
+        ValueWidget::accept();
     else
         warning(tr("You must choose one of the values."));
 }

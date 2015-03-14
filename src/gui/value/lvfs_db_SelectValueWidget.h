@@ -17,18 +17,19 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_EDITCOMPOSITEVALUEDIALOG_H_
-#define LVFS_DB_EDITCOMPOSITEVALUEDIALOG_H_
+#ifndef LVFS_DB_SELECTVALUEWIDGET_H_
+#define LVFS_DB_SELECTVALUEWIDGET_H_
 
-#include "../lvfs_db_EntityValueDialog.h"
+#include "lvfs_db_ValueWidget.h"
 
 
-class PLATFORM_MAKE_PRIVATE EditCompositeValueDialog : public EntityValueDialog
+class PLATFORM_MAKE_PRIVATE SelectValueWidget : public ValueWidget
 {
-    Q_OBJECT
-
 public:
-    EditCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent = 0);
+    SelectValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, NestedDialog *parent);
+
+    EntityValue value();
+    virtual void accept();
 };
 
-#endif /* LVFS_DB_EDITCOMPOSITEVALUEDIALOG_H_ */
+#endif /* LVFS_DB_SELECTVALUEWIDGET_H_ */

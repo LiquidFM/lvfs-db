@@ -26,7 +26,7 @@
 #include "../query/lvfs_db_QueryResultsNode.h"
 #include "../filesystem/lvfs_db_FileSystemDirectory.h"
 
-#include "../../gui/value/list/editable/lvfs_db_EditableValueListDialog.h"
+#include "../../gui/value/lvfs_db_EntityValueDialog.h"
 #include "../../gui/query/create/lvfs_db_CreateQueryDialog.h"
 #include "../../lvfs_db_common.h"
 
@@ -175,9 +175,9 @@ Interface::Holder RootNode::activated(const Interface::Holder &view, const QMode
         if (m_container->transaction())
         {
             EntityValueReader reader(m_container->entityValues(static_cast<RootNodeEntityItem *>(item)->entity()));
-            EditableValueListDialog dialog(m_container, reader, view->as<Core::IView>()->widget());
+            EntityValueDialog dialog(m_container, reader, view->as<Core::IView>()->widget());
 
-            if (dialog.exec() == EditableValueListDialog::Accepted)
+            if (dialog.exec() == EntityValueDialog::Accepted)
             {
                 if (!m_container->commit())
                 {

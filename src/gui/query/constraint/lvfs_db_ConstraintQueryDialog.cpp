@@ -18,7 +18,7 @@
  */
 
 #include "lvfs_db_ConstraintQueryDialog.h"
-#include "../../value/list/static/lvfs_db_StaticValueListDialog.h"
+#include "../../value/lvfs_db_SelectValueDialog.h"
 #include "../../../constraints/value/lvfs_db_ValueConstraint.h"
 #include "../../../lvfs_db_common.h"
 
@@ -127,11 +127,11 @@ void ConstraintQueryDialog::accept()
 void ConstraintQueryDialog::chooseValue()
 {
     EntityValueReader reader(m_container->entityValues(m_property.entity));
-    StaticValueListDialog dialog(m_container, reader, this);
+    SelectValueDialog dialog(m_container, reader, this);
 
-    if (dialog.exec() == StaticValueListDialog::Accepted)
+    if (dialog.exec() == SelectValueDialog::Accepted)
     {
-        updateValue(dialog.takeValue());
+        updateValue(dialog.value());
         m_buttonBox.setFocus();
     }
     else

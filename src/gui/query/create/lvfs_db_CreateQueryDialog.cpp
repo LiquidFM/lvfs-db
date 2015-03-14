@@ -20,7 +20,7 @@
 #include "lvfs_db_CreateQueryDialog.h"
 #include "model/items/lvfs_db_QueryEntitiesModelItem.h"
 #include "../constraint/lvfs_db_ConstraintQueryDialog.h"
-#include "../../value/list/static/lvfs_db_StaticValueListDialog.h"
+#include "../../value/lvfs_db_SelectValueDialog.h"
 #include "../../../constraints/value/lvfs_db_ValueConstraint.h"
 #include "../../../lvfs_db_common.h"
 
@@ -178,15 +178,15 @@ void CreateQueryDialog::addConstraint()
             if (static_cast<QueryEntitiesModelItem *>(index1.internalPointer())->property().entity.type() == Entity::Composite)
             {
                 EntityValueReader reader(m_container->entityValues(static_cast<QueryEntitiesModelItem *>(index1.internalPointer())->property().entity));
-                StaticValueListDialog dialog(m_container, reader, this);
+                SelectValueDialog dialog(m_container, reader, this);
 
-                if (dialog.exec() == StaticValueListDialog::Accepted)
+                if (dialog.exec() == SelectValueDialog::Accepted)
                 {
                     BaseConstraint::Holder constraint(
                             new ValueConstraint(
                                     static_cast<QueryEntitiesModelItem *>(index1.internalPointer())->property(),
                                     Constraint::Equal,
-                                    dialog.takeValue(),
+                                    dialog.value(),
                                     static_cast<BaseConstraint *>(index2.internalPointer())));
 
                     m_model2.add(constraint, index2);

@@ -30,29 +30,21 @@ class PLATFORM_MAKE_PRIVATE EntityValueDialog : public NestedPlainDialog
 
 public:
     EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, QWidget *parent = 0);
+    EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent = 0);
     EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
-
-protected:
-    virtual void addValue();
-    virtual void removeValue();
 
 protected:
     QModelIndex currentIndex() const { return m_mainWidget.currentIndex(); }
 
-    const Interface::Adaptor<IStorage> &storage() const { return m_mainWidget.storage(); }
-    Interface::Adaptor<IStorage> &storage() { return m_mainWidget.storage(); }
-
-    const ValueModel &model() const { return m_mainWidget.model(); }
-    ValueModel &model() { return m_mainWidget.model(); }
-
-    void doAddValue() { m_mainWidget.addValue(); }
-    void doRemoveValue() { m_mainWidget.removeValue(); }
-    void doEdit() { m_mainWidget.edit(); }
+private:
+    void edit();
+    bool dblClick();
+    void addValue();
+    void removeValue();
+    void setFocusToFilter();
 
 private:
-    void openFile1();
-    void openFile2();
-    void edit();
+    void init(const QRect &geometry);
 
 private:
     typedef MouseDoubleClickEventHandler<
@@ -60,7 +52,8 @@ private:
                     EventHandlerBase<
                         EntityValueDialog
                     >
-                >
+                >,
+                Templates::bool_value<false>
             > TreeViewHandler;
 
 private:

@@ -17,17 +17,22 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lvfs_db_SelectableValueListWidget.h"
+#ifndef LVFS_DB_SELECTVALUEDIALOG_H_
+#define LVFS_DB_SELECTVALUEDIALOG_H_
+
+#include "lvfs_db_EntityValueDialog.h"
 
 
-SelectableValueListWidget::SelectableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent) :
-    ValueWidget(container, reader, parent, QString())
-{}
-
-void SelectableValueListWidget::accept()
+class PLATFORM_MAKE_PRIVATE SelectValueDialog : public EntityValueDialog
 {
-    if (currentIndex().isValid())
-        ValueWidget::accept();
-    else
-        warning(tr("You must choose one of the values."));
-}
+    Q_OBJECT
+
+public:
+    SelectValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent = 0);
+    virtual ~SelectValueDialog();
+
+    EntityValue value();
+    virtual void accept();
+};
+
+#endif /* LVFS_DB_SELECTVALUEDIALOG_H_ */

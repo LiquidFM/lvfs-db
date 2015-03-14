@@ -19,7 +19,7 @@
 
 #include "lvfs_db_ValueWidget.h"
 
-#include "list/selectable/widgets/lvfs_db_SelectableValueListWidget.h"
+#include "lvfs_db_SelectValueWidget.h"
 #include "simple/rating/widgets/lvfs_db_RatingValueWidget.h"
 #include "simple/widgets/lvfs_db_SimpleValueWidget.h"
 
@@ -46,13 +46,13 @@ public:
 
 
 template <Entity::Type EntityType>
-inline EntityValue defaultProcessAddValue(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue defaultProcessAddValue(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
     typedef NewValueDialog<EntityType> NewValueDialog;
     NewValueDialog dialog(parent, title);
 
     if (dialog.exec() == NewValueDialog::Accepted)
-        return container->addValue(entity, toVariant(dialog.value()));
+        return storage->addValue(entity, toVariant(dialog.value()));
     else
         declined = true;
 
@@ -60,70 +60,70 @@ inline EntityValue defaultProcessAddValue(NestedDialog *parent, const QString &t
 }
 
 template <Entity::Type EntityType>
-inline EntityValue processAddValue(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue processAddValue(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
-    return defaultProcessAddValue<EntityType>(parent, title, container, entity, declined);
+    return defaultProcessAddValue<EntityType>(parent, title, storage, entity, declined);
 }
 
 template <>
-inline EntityValue processAddValue<Entity::Int>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue processAddValue<Entity::Int>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
-    if (container->schema(entity) == IStorage::Rating)
+    if (storage->schema(entity) == IStorage::Rating)
     {
         RatingValueWidget widget(parent, title);
 
         if (widget.exec() == RatingValueWidget::Accepted)
-            return container->addValue(entity, widget.value());
+            return storage->addValue(entity, widget.value());
         else
             declined = true;
     }
     else
-        return defaultProcessAddValue<Entity::Int>(parent, title, container, entity, declined);
+        return defaultProcessAddValue<Entity::Int>(parent, title, storage, entity, declined);
 
     return EntityValue();
 }
 
 template <>
-inline EntityValue processAddValue<Entity::String>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue processAddValue<Entity::String>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
-    if (container->schema(entity) == IStorage::Path)
+    if (storage->schema(entity) == IStorage::Path)
     {
         declined = false;
         return EntityValue();
     }
     else
-        return defaultProcessAddValue<Entity::String>(parent, title, container, entity, declined);
+        return defaultProcessAddValue<Entity::String>(parent, title, storage, entity, declined);
 
     return EntityValue();
 }
 
 template <>
-inline EntityValue processAddValue<Entity::Memo>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue processAddValue<Entity::Memo>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
     declined = false;
     return EntityValue();
 }
 
 template <>
-inline EntityValue processAddValue<Entity::Composite>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &container, const Entity &entity, bool &declined)
+inline EntityValue processAddValue<Entity::Composite>(NestedDialog *parent, const QString &title, Interface::Adaptor<IStorage> &storage, const Entity &entity, bool &declined)
 {
-    if (container->transaction())
+    if (storage->transaction())
     {
-        EntityValue value(container->addValue(entity));
+        EntityValue value(storage->addValue(entity));
 
         if (value.isValid())
         {
-            ValueWidget widget(container, value, parent, title);
+            ValueWidget widget(storage, value, parent, title);
 
             if (widget.exec() == ValueWidget::Accepted)
-                if (container->commit())
+                if (storage->commit())
                     return value;
                 else
-                    container->rollback();
+                    storage->rollback();
             else
             {
                 declined = true;
-                container->rollback();
+                storage->rollback();
             }
         }
     }
@@ -186,9 +186,27 @@ ValueWidgetPrivate::ValueWidgetPrivate(const Interface::Adaptor<IStorage> &stora
     init();
 }
 
-void ValueWidgetPrivate::setCurrentIndex(Item *item)
+void ValueWidgetPrivate::edit()
 {
-    m_view.setCurrentIndex(m_proxy.mapFromSource(m_model.index(m_model.indexOf(item), 0)));
+    m_view.edit(currentIndex());
+}
+
+bool ValueWidgetPrivate::dblClick()
+{
+    QModelIndex index = currentIndex();
+
+    if (index.isValid())
+    {
+        Item *item = static_cast<Item *>(index.internalPointer());
+
+        if (item->isPath())
+        {
+            static_cast<FileItem *>(item)->open();
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void ValueWidgetPrivate::addValue()
@@ -255,6 +273,11 @@ void ValueWidgetPrivate::removeValue()
     }
 }
 
+void ValueWidgetPrivate::setFocusToFilter()
+{
+    m_filter.setFocus();
+}
+
 void ValueWidgetPrivate::doAddValue()
 {
     bool declined = false;
@@ -318,14 +341,14 @@ void ValueWidgetPrivate::doAddValue(PropertyItem *item)
     if (m_storage->transaction())
     {
         EntityValueReader reader(m_storage->entityValues(item->entity()));
-        SelectableValueListWidget dialog(m_storage, reader, m_callback->parent());
+        SelectValueWidget dialog(m_storage, reader, m_callback->parent());
 
-        if (dialog.exec() == SelectableValueListWidget::Accepted)
+        if (dialog.exec() == SelectValueWidget::Accepted)
         {
             EntityValue value;
             const EntityValue &parentValue = item->parent() ? static_cast<ValueItem *>(item->parent())->value() : m_value;
 
-            if (m_storage->addValue(parentValue, value = dialog.takeValue()))
+            if (m_storage->addValue(parentValue, value = dialog.value()))
                 if (m_storage->commit())
                     setCurrentIndex(m_model.add(item, value));
                 else
@@ -499,6 +522,16 @@ void ValueWidget::critical(const QString &text)
     BaseNestedWidget::critical(text);
 }
 
+void ValueWidget::edit()
+{
+    m_private.edit();
+}
+
+bool ValueWidget::dblClick()
+{
+    return m_private.dblClick();
+}
+
 void ValueWidget::addValue()
 {
     m_private.addValue();
@@ -516,10 +549,13 @@ void ValueWidget::setFocusToFilter()
 
 void ValueWidget::init()
 {
+    m_handler.registerMouseDoubleClickEventHandler(&ValueWidget::dblClick);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_F2,     &ValueWidget::edit);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Insert, &ValueWidget::addValue);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Delete, &ValueWidget::removeValue);
-    m_handler.registerShortcut(Qt::CTRL, Qt::Key_F, &ValueWidget::setFocusToFilter);
-    m_private.view().setToolTip(tr("INS - add value\nDEL - remove value\nCTRL+F - activate filter field"));
+    m_handler.registerShortcut(Qt::CTRL,       Qt::Key_F,      &ValueWidget::setFocusToFilter);
+    m_handler.registerShortcut(Qt::CTRL,       Qt::Key_Return, &ValueWidget::accept);
 
+    m_private.view().setToolTip(tr("INS - add value\nDEL - remove value\nCTRL+F - activate filter field"));
     setCentralWidget(&m_private);
 }
