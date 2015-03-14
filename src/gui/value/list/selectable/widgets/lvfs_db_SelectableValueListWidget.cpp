@@ -21,13 +21,13 @@
 
 
 SelectableValueListWidget::SelectableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent) :
-    EditableValueListWidget(container, reader, parent)
+    ValueWidget(container, reader, parent, QString())
 {}
 
 void SelectableValueListWidget::accept()
 {
     if (currentIndex().isValid())
-        EditableValueListWidget::accept();
+        ValueWidget::accept();
     else
         warning(tr("You must choose one of the values."));
 }

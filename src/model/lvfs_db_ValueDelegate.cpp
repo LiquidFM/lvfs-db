@@ -31,10 +31,10 @@
 namespace LVFS {
 namespace Db {
 
-ValueDelegate::ValueDelegate(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent) :
+ValueDelegate::ValueDelegate(const Interface::Adaptor<IStorage> &storage, const Entity &entity, QObject *parent) :
     Delegate(parent),
-    m_entity(value.entity()),
-    m_container(container)
+    m_storage(storage),
+    m_entity(entity)
 {}
 
 QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -46,13 +46,13 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
         switch (item->value().entity().type())
         {
             case Entity::Int:
-//                if (m_container->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Rating)
+//                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Rating)
 //                    return new Editor<typename EntityValueType<Entity::Int>::type>::type(parent);
 //                else
                     return new Editor<typename EntityValueType<Entity::Int>::type>::type(parent);
 
             case Entity::String:
-//                if (m_container->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
+//                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
 //                    return new Editor<typename EntityValueType<Entity::String>::type>::type(parent);
 //                else
                     return new Editor<typename EntityValueType<Entity::String>::type>::type(parent);
@@ -71,23 +71,23 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
 
             case Entity::Composite:
             {
-                if (m_container->transaction())
+                if (m_storage->transaction())
                 {
-                    EditCompositeValueDialog dialog(m_container, item->value(), parent);
+                    EditCompositeValueDialog dialog(m_storage, item->value(), parent);
 
                     if (dialog.exec() != EditCompositeValueDialog::Accepted)
-                        m_container->rollback();
+                        m_storage->rollback();
                     else
-                        if (m_container->commit())
+                        if (m_storage->commit())
                             CompositeEntityValue(item->value()).resetValue();
                         else
                         {
-                            m_container->rollback();
-                            QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                            m_storage->rollback();
+                            QMessageBox::critical(parent, tr("Error"), toUnicode(m_storage->lastError()));
                         }
                 }
                 else
-                    QMessageBox::critical(parent, tr("Error"), toUnicode(m_container->lastError()));
+                    QMessageBox::critical(parent, tr("Error"), toUnicode(m_storage->lastError()));
 
                 break;
             }
@@ -112,7 +112,7 @@ void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
         switch (item->value().entity().type())
         {
             case Entity::Int:
-//                if (m_container->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Rating)
+//                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Rating)
 //                    EditorValue<typename EntityValueType<Entity::Int>::type>::setValue(editor, index.data(Qt::DisplayRole));
 //                else
                     EditorValue<typename EntityValueType<Entity::Int>::type>::setValue(editor, index.data(Qt::DisplayRole));
@@ -120,7 +120,7 @@ void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
                 break;
 
             case Entity::String:
-//                if (m_container->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
+//                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
 //                    EditorValue<typename EntityValueType<Entity::String>::type>::setValue(editor, index.data(Qt::DisplayRole));
 //                else
                     EditorValue<typename EntityValueType<Entity::String>::type>::setValue(editor, index.data(Qt::DisplayRole));
@@ -190,35 +190,35 @@ void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
                 break;
         }
 
-        if (m_container->transaction())
-//            if (m_container->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
+        if (m_storage->transaction())
+//            if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
 //            {
 //                QString error;
 //                QueryResultPathValueItem *file = static_cast<QueryResultPathValueItem *>(item);
 //                QString fileName = file->info().fileName();
 //
 //                if (file->info().rename(value.toString(), error))
-//                    if (m_container->updateValue(file->value(), file->info().absoluteFilePath(value.toString())))
-//                        if (m_container->commit())
+//                    if (m_storage->updateValue(file->value(), file->info().absoluteFilePath(value.toString())))
+//                        if (m_storage->commit())
 //                            file->update();
 //                        else
 //                        {
-//                            m_container->rollback();
+//                            m_storage->rollback();
 //                            file->info().rename(fileName, error);
-//                            QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
+//                            QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
 //                        }
 //                    else
 //                    {
-//                        m_container->rollback();
+//                        m_storage->rollback();
 //                        file->info().rename(fileName, error);
 //                        QMessageBox::critical(
 //                                      editor,
 //                                      tr("Failed to rename file \"%1\"").arg(file->info().fileName()),
-//                                      toUnicode(m_container->lastError()));
+//                                      toUnicode(m_storage->lastError()));
 //                    }
 //                else
 //                {
-//                    m_container->rollback();
+//                    m_storage->rollback();
 //                    QMessageBox::critical(
 //                            editor,
 //                            tr("Failed to rename file \"%1\"").
@@ -227,35 +227,35 @@ void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
 //                }
 //            }
 //            else
-                if (m_container->updateValue(item->value(), value))
+                if (m_storage->updateValue(item->value(), value))
                 {
-                    if (!m_container->commit())
+                    if (!m_storage->commit())
                     {
-                        QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
-                        m_container->rollback();
+                        QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
+                        m_storage->rollback();
                     }
                 }
                 else
                 {
-                    QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
-                    m_container->rollback();
+                    QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
+                    m_storage->rollback();
                 }
         else
-            QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
+            QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
     }
     else
-        if (m_container->transaction())
+        if (m_storage->transaction())
         {
             PropertyItem *property = static_cast<PropertyItem *>(index.internalPointer());
 
-            if (m_container->renameProperty(m_entity, property->entity(), fromUnicode(EditorValue<QString>::value(editor)).data()))
+            if (m_storage->renameProperty(m_entity, property->entity(), fromUnicode(EditorValue<QString>::value(editor)).data()))
             {
-                if (m_container->commit())
+                if (m_storage->commit())
                     property->setName(EditorValue<QString>::value(editor));
                 else
                 {
-                    QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
-                    m_container->rollback();
+                    QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
+                    m_storage->rollback();
                 }
             }
             else
@@ -263,12 +263,12 @@ void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
                 QMessageBox::critical(
                             editor,
                             tr("Failed to rename property \"%1\"").arg(property->name()),
-                            toUnicode(m_container->lastError()));
-                m_container->rollback();
+                            toUnicode(m_storage->lastError()));
+                m_storage->rollback();
             }
         }
         else
-            QMessageBox::critical(editor, tr("Error"), toUnicode(m_container->lastError()));
+            QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
 }
 
 }}

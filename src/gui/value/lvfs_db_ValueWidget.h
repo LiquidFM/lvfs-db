@@ -17,29 +17,36 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_EDITABLEVALUELISTWIDGET_H_
-#define LVFS_DB_EDITABLEVALUELISTWIDGET_H_
+#ifndef LVFS_DB_VALUEWIDGET_H_
+#define LVFS_DB_VALUEWIDGET_H_
 
 #include <QtGui/QTreeView>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
 #include <QtCore/QCoreApplication>
-#include <lvfs-db/IStorage>
-#include <lvfs-core/tools/events/MouseEventHandler>
-#include <lvfs-core/tools/events/MouseEventSource>
 #include <lvfs-core/tools/events/KeyboardEventHandler>
 #include <lvfs-core/tools/events/KeyboardEventSource>
+#include <lvfs-core/tools/events/MouseEventHandler>
+#include <lvfs-core/tools/events/MouseEventSource>
 #include <lvfs-core/tools/widgets/NestedWidget>
-#include "../model/lvfs_db_EditableValueListModel.h"
-#include "../../../../../model/lvfs_db_FilterValueModel.h"
-#include "../../../../../model/items/lvfs_db_Item.h"
+#include "../../model/lvfs_db_ValueModel.h"
+#include "../../model/lvfs_db_ValueDelegate.h"
+#include "../../model/lvfs_db_FilterValueModel.h"
 
+
+namespace LVFS {
+namespace Db {
+
+class Item;
+class PropertyItem;
+
+}}
 
 using namespace ::LVFS;
 using namespace ::LVFS::Db;
 using namespace ::LVFS::Tools;
 
-class PLATFORM_MAKE_PRIVATE EditableValueListWidgetPrivate : public QWidget
+class PLATFORM_MAKE_PRIVATE ValueWidgetPrivate : public QWidget
 {
     Q_OBJECT
 
@@ -70,34 +77,40 @@ public:
 
     typedef KeyboardEventHandler<
                 EventHandlerBase<
-                    EditableValueListWidgetPrivate
+                    ValueWidgetPrivate
                 >
             > LineEditHandler;
 
 public:
-    EditableValueListWidgetPrivate(ICallback *callback, EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader);
+    ValueWidgetPrivate(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, ICallback *callback, EventHandler *handler);
+    ValueWidgetPrivate(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, ICallback *callback, EventHandler *handler);
+    ValueWidgetPrivate(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, ICallback *callback, EventHandler *handler);
 
-    const Interface::Adaptor<IStorage> &container() const { return m_container; }
-    Interface::Adaptor<IStorage> &container() { return m_container; }
+    const Interface::Adaptor<IStorage> &storage() const { return m_storage; }
+    Interface::Adaptor<IStorage> &storage() { return m_storage; }
 
     const Entity &entity() const { return m_entity; }
 
     const TreeView &view() const { return m_view; }
     TreeView &view() { return m_view; }
 
-    const EditableValueListModel &model() const { return m_model; }
-    EditableValueListModel &model() { return m_model; }
-
     const FilterValueModel &proxy() const { return m_proxy; }
     FilterValueModel &proxy() { return m_proxy; }
 
-    QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
-    void setCurrentIndex(Item *item) { m_view.setCurrentIndex(m_proxy.mapFromSource(m_model.index(m_model.indexOf(item), 0))); }
+    const ValueModel &model() const { return m_model; }
+    ValueModel &model() { return m_model; }
 
+    QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
+    void setCurrentIndex(Item *item);
+
+    void edit() { m_view.edit(currentIndex()); }
     void addValue();
     void removeValue();
-//    void select(const QModelIndex &index);
     void setFocusToFilter() { m_filter.setFocus(); }
+
+private:
+    void doAddValue();
+    void doAddValue(PropertyItem *item);
 
 private Q_SLOTS:
     void setFilter();
@@ -108,9 +121,15 @@ private:
     void setCurrentIndex(const QModelIndex &index) const;
 
 private:
+    void init();
+
+private:
+    Interface::Adaptor<IStorage> m_storage;
+    EntityValue m_value;
+    Entity m_entity;
+
+private:
     ICallback *m_callback;
-    Interface::Adaptor<IStorage> m_container;
-    const Entity &m_entity;
 
     QVBoxLayout m_vLayout;
     QHBoxLayout m_hLayout;
@@ -120,83 +139,95 @@ private:
     QPushButton m_search;
 
     TreeView m_view;
-    EditableValueListModel m_model;
+    ValueDelegate m_delegate;
+    ValueModel m_model;
     FilterValueModel m_proxy;
 };
 
 
-class PLATFORM_MAKE_PRIVATE MainEditableValueListWidget : public BaseNestedWidget, public EditableValueListWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE MainValueWidget : public BaseNestedWidget, public ValueWidgetPrivate::ICallback
 {
 public:
-    MainEditableValueListWidget(EventHandler *handler, const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);
+    MainValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, EventHandler *handler, NestedDialog *parent);
+    MainValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, EventHandler *handler, NestedDialog *parent);
+    MainValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, EventHandler *handler, NestedDialog *parent);
 
     /* BaseNestedWidget */
     virtual QWidget *centralWidget();
     virtual void setReadOnly(bool value);
     virtual void setFocus();
 
-    /* EditableValueListWidgetPrivate::ICallback */
+    /* ValueWidgetPrivate::ICallback */
     virtual void acceptAndClose();
     virtual NestedDialog *parent();
     virtual void critical(const QString &text);
 
-    const Interface::Adaptor<IStorage> &container() const { return m_private.container(); }
-    Interface::Adaptor<IStorage> &container() { return m_private.container(); }
+    const Interface::Adaptor<IStorage> &storage() const { return m_private.storage(); }
+    Interface::Adaptor<IStorage> &storage() { return m_private.storage(); }
 
     const Entity &entity() const { return m_private.entity(); }
+
+    const ValueModel &model() const { return m_private.model(); }
+    ValueModel &model() { return m_private.model(); }
 
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
     void setCurrentIndex(Item *item) { m_private.setCurrentIndex(item); }
 
     EntityValue takeValue() { return m_private.model().take(currentIndex()); }
 
-    void closeDbContext() { m_private.model().close(); }
-
+    void edit() { m_private.edit(); }
     void addValue() { m_private.addValue(); }
     void removeValue() { m_private.removeValue(); }
-//    void select(const QModelIndex &index) { m_private.select(index); }
     void setFocusToFilter() { m_private.setFocusToFilter(); }
     void setViewToolTip(const QString &value) { m_private.view().setToolTip(value); }
 
 private:
-    EditableValueListWidgetPrivate m_private;
+    ValueWidgetPrivate m_private;
 };
 
 
-class PLATFORM_MAKE_PRIVATE EditableValueListWidget : public NestedWidget, public EditableValueListWidgetPrivate::ICallback
+class PLATFORM_MAKE_PRIVATE ValueWidget : public NestedWidget, public ValueWidgetPrivate::ICallback
 {
 public:
-    EditableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);
+    ValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, NestedDialog *parent, const QString &title);
+    ValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, NestedDialog *parent, const QString &title);
+    ValueWidget(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, NestedDialog *parent, const QString &title);
 
     /* BaseNestedWidget */
     virtual void setFocus();
 
-    /* EditableValueListWidgetPrivate::ICallback */
+    /* ValueWidgetPrivate::ICallback */
     virtual void acceptAndClose();
     virtual NestedDialog *parent();
     virtual void critical(const QString &text);
 
-    const Interface::Adaptor<IStorage> &container() const { return m_private.container(); }
-    Interface::Adaptor<IStorage> &container() { return m_private.container(); }
+    const Interface::Adaptor<IStorage> &storage() const { return m_private.storage(); }
+    Interface::Adaptor<IStorage> &storage() { return m_private.storage(); }
+
+    const ValueModel &model() const { return m_private.model(); }
+    ValueModel &model() { return m_private.model(); }
 
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
+
     EntityValue takeValue() { return m_private.model().take(currentIndex()); }
 
     void addValue();
     void removeValue();
-//    void select(const QModelIndex &index) { m_private.select(index); }
     void setFocusToFilter();
+
+private:
+    void init();
 
 private:
     typedef KeyboardEventHandler<
                 EventHandlerBase<
-                    EditableValueListWidget
+                    ValueWidget
                 >
             > TreeViewHandler;
 
 private:
     TreeViewHandler m_handler;
-    EditableValueListWidgetPrivate m_private;
+    ValueWidgetPrivate m_private;
 };
 
-#endif /* LVFS_DB_EDITABLEVALUELISTWIDGET_H_ */
+#endif /* LVFS_DB_VALUEWIDGET_H_ */

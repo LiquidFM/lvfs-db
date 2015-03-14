@@ -32,15 +32,15 @@ class PLATFORM_MAKE_PRIVATE ValueDelegate : public Delegate
     PLATFORM_MAKE_NONCOPYABLE(ValueDelegate)
 
 public:
-    ValueDelegate(const EntityValue &value, const Interface::Adaptor<IStorage> &container, QObject *parent = 0);
+    ValueDelegate(const Interface::Adaptor<IStorage> &storage, const Entity &entity, QObject *parent = 0);
 
     virtual QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual void setEditorData(QWidget *editor, const QModelIndex &index) const;
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
 private:
+    const Interface::Adaptor<IStorage> &m_storage;
     const Entity &m_entity;
-    Interface::Adaptor<IStorage> m_container;
 };
 
 }}

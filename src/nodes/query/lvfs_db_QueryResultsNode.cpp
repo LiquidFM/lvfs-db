@@ -38,7 +38,7 @@ using namespace LiquidDb;
 
 
 QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, const Interface::Holder &parent) :
-    ListValueModel(storage, reader),
+    ValueModel(storage, reader),
     Complements(storage.interface(), parent),
     m_geometry(),
     m_sorting(0, ::Qt::AscendingOrder)
@@ -193,7 +193,7 @@ void QueryResultsNode::remove(const Interface::Holder &view, const QModelIndex &
             {
                 PropertyItem::size_type idx = property->indexOf(valueItem);
 
-                beginRemoveRows(ListValueModel::parent(index), idx, idx);
+                beginRemoveRows(ValueModel::parent(index), idx, idx);
                 property->remove(idx);
                 endRemoveRows();
             }

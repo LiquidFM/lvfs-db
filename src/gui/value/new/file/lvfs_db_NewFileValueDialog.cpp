@@ -21,8 +21,8 @@
 #include "../../../../model/items/lvfs_db_PropertyItem.h"
 
 
-NewFileValueDialog::NewFileValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent) :
-    NewCompositeValueDialog(container, value, files, parent)
+NewFileValueDialog::NewFileValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, QWidget *parent) :
+    NewCompositeValueDialog(storage, value, files, parent)
 {}
 
 void NewFileValueDialog::addValue()
@@ -30,8 +30,8 @@ void NewFileValueDialog::addValue()
     QModelIndex index = currentIndex();
 
     if (index.isValid() && static_cast<Item *>(index.internalPointer())->isProperty() &&
-        container()->schema(static_cast<PropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
-        doAddValue(index);
+        storage()->schema(static_cast<PropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
+        doAddValue();
 }
 
 void NewFileValueDialog::removeValue()
@@ -39,6 +39,6 @@ void NewFileValueDialog::removeValue()
     QModelIndex index = currentIndex();
 
     if (index.isValid() && !static_cast<Item *>(index.internalPointer())->isProperty() &&
-        container()->schema(static_cast<PropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
-        doRemoveValue(index);
+        storage()->schema(static_cast<PropertyItem *>(index.internalPointer())->entity()) != IStorage::Path)
+        doRemoveValue();
 }

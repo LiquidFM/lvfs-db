@@ -21,12 +21,12 @@
 #include "../../../../model/items/lvfs_db_FileItem.h"
 
 
-StaticValueListDialog::StaticValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
+StaticValueListDialog::StaticValueListDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent) :
     NestedPlainDialog(parent),
     m_handler(this),
-    m_widget(&m_handler, container, reader, this)
+    m_widget(storage, reader, &m_handler, this)
 {
-    QRect geometry = toQRect(container->listGeometry(m_widget.entity()));
+    QRect geometry = toQRect(storage->listGeometry(m_widget.entity()));
 
     if (geometry.isValid())
         setGeometry(geometry);
@@ -42,7 +42,7 @@ StaticValueListDialog::StaticValueListDialog(const Interface::Adaptor<IStorage> 
 
 StaticValueListDialog::~StaticValueListDialog()
 {
-    m_widget.container()->setListGeometry(m_widget.entity(), fromQRect(geometry()));
+    m_widget.storage()->setListGeometry(m_widget.entity(), fromQRect(geometry()));
 }
 
 EntityValue StaticValueListDialog::takeValue()

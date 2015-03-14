@@ -133,7 +133,7 @@ void RootView::goIntoShortcut()
         Interface::Holder newNode = m_node->as<Db::INode>()->activated(Interface::Holder::fromRawData(this), index);
 
         if (newNode.isValid())
-            m_mainView->as<Core::IMainView>()->show(newNode, Interface::Holder::fromRawData(this));
+            m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
     }
 }
 

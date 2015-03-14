@@ -21,12 +21,12 @@
 #include "../../../../model/items/lvfs_db_FileItem.h"
 
 
-EditableValueListDialog::EditableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent) :
+EditableValueListDialog::EditableValueListDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent) :
     NestedPlainDialog(parent),
     m_handler(this),
-    m_widget(&m_handler, container, reader, this)
+    m_widget(storage, reader, &m_handler, this)
 {
-    QRect geometry = toQRect(container->listGeometry(m_widget.entity()));
+    QRect geometry = toQRect(storage->listGeometry(m_widget.entity()));
 
     if (geometry.isValid())
         setGeometry(geometry);
@@ -44,18 +44,6 @@ EditableValueListDialog::EditableValueListDialog(const Interface::Adaptor<IStora
 
 EditableValueListDialog::~EditableValueListDialog()
 {}
-
-void EditableValueListDialog::accept()
-{
-    m_widget.closeDbContext();
-    NestedPlainDialog::accept();
-}
-
-void EditableValueListDialog::reject()
-{
-    m_widget.closeDbContext();
-    NestedPlainDialog::reject();
-}
 
 EntityValue EditableValueListDialog::takeValue()
 {

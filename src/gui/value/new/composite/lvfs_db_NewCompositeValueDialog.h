@@ -20,10 +20,10 @@
 #ifndef LVFS_DB_NEWCOMPOSITEVALUEDIALOG_H_
 #define LVFS_DB_NEWCOMPOSITEVALUEDIALOG_H_
 
-#include "../../composite/lvfs_db_CompositeValueDialog.h"
+#include "../../lvfs_db_EntityValueDialog.h"
 
 
-class PLATFORM_MAKE_PRIVATE NewCompositeValueDialog : public CompositeValueDialog
+class PLATFORM_MAKE_PRIVATE NewCompositeValueDialog : public EntityValueDialog
 {
     Q_OBJECT
 

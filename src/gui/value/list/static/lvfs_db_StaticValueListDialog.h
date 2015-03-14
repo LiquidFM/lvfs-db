@@ -21,7 +21,7 @@
 #define LVFS_DB_STATICVALUELISTDIALOG_H_
 
 #include <lvfs-core/tools/widgets/NestedPlainDialog>
-#include "../editable/widgets/lvfs_db_EditableValueListWidget.h"
+#include  "../../lvfs_db_ValueWidget.h"
 
 
 class PLATFORM_MAKE_PRIVATE StaticValueListDialog : public NestedPlainDialog
@@ -29,7 +29,7 @@ class PLATFORM_MAKE_PRIVATE StaticValueListDialog : public NestedPlainDialog
     Q_OBJECT
 
 public:
-    StaticValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent = 0);
+    StaticValueListDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent = 0);
     virtual ~StaticValueListDialog();
 
     EntityValue takeValue();
@@ -52,7 +52,7 @@ private:
 
 private:
     TreeViewHandler m_handler;
-    MainEditableValueListWidget m_widget;
+    MainValueWidget m_widget;
 };
 
 #endif /* LVFS_DB_STATICVALUELISTDIALOG_H_ */

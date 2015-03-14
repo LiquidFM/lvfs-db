@@ -22,13 +22,13 @@
 
 
 NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent) :
-    CompositeValueDialog(container, value, parent)
+    EntityValueDialog(container, value, parent)
 {
     setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
 }
 
 NewCompositeValueDialog::NewCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent) :
-    CompositeValueDialog(container, value, files, parent)
+    EntityValueDialog(container, value, files, parent)
 {
     setWindowTitle(tr("New value for \"%1\"").arg(toUnicode(value.entity().name())));
 }

@@ -23,7 +23,7 @@
 #include <lvfs-db/IStorage>
 #include <lvfs-core/models/Node>
 #include "../../lvfs_db_INode.h"
-#include "../../model/lvfs_db_ListValueModel.h"
+#include "../../model/lvfs_db_ValueModel.h"
 
 
 namespace LVFS {
@@ -32,7 +32,7 @@ namespace Db {
 using namespace LiquidDb;
 
 
-class PLATFORM_MAKE_PRIVATE QueryResultsNode : public ListValueModel, public Complements<Core::Node, Db::INode>
+class PLATFORM_MAKE_PRIVATE QueryResultsNode : public ValueModel, public Complements<Core::Node, Db::INode>
 {
 public:
     QueryResultsNode(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, const Interface::Holder &parent);

@@ -22,7 +22,7 @@
 
 
 EditCompositeValueDialog::EditCompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent) :
-    CompositeValueDialog(container, value, parent)
+    EntityValueDialog(container, value, parent)
 {
     setWindowTitle(tr("Editing value of \"%1\"").arg(toUnicode(value.entity().name())));
 }

@@ -29,6 +29,7 @@
 namespace LVFS {
 namespace Db {
 
+class PropertyItem;
 using namespace LiquidDb;
 
 
@@ -38,17 +39,28 @@ public:
     typedef EFC::Map<Entity::Id, Interface::Holder> Files;
 
 public:
-    ValueModel(QObject *parent = 0);
+    ValueModel(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, QObject *parent = 0);
+    ValueModel(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QObject *parent = 0);
+    ValueModel(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, QObject *parent = 0);
 
     virtual ::Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual void fetchMore(const QModelIndex &parent);
+    virtual bool canFetchMore(const QModelIndex &parent = QModelIndex()) const;
 
-    void add(const QModelIndex &property, const EntityValue &value);
-    void add(const QModelIndex &property, const EntityValue::List &values);
-    void set(const Interface::Adaptor<IStorage> &storage, const EntityValue &value);
-    void set(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const Files &files);
+    using Model::indexOf;
+    EntityValue take(const QModelIndex &index);
 
+    QModelIndex add(const EntityValue &value);
+    QModelIndex add(PropertyItem *parent, const EntityValue &value);
     void remove(const QModelIndex &index);
     void update(const QModelIndex &index);
+
+protected:
+    enum { PrefetchLimit = 64 };
+
+protected:
+    const Interface::Adaptor<IStorage> &m_storage;
+    EntityValueReader m_reader;
 };
 
 }}

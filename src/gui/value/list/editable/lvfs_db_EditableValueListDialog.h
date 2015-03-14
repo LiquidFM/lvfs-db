@@ -21,7 +21,7 @@
 #define LVFS_DB_EDITABLEVALUELISTDIALOG_H_
 
 #include <lvfs-core/tools/widgets/NestedPlainDialog>
-#include "widgets/lvfs_db_EditableValueListWidget.h"
+#include "../../lvfs_db_ValueWidget.h"
 
 
 class PLATFORM_MAKE_PRIVATE EditableValueListDialog : public NestedPlainDialog
@@ -29,11 +29,8 @@ class PLATFORM_MAKE_PRIVATE EditableValueListDialog : public NestedPlainDialog
     Q_OBJECT
 
 public:
-    EditableValueListDialog(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, QWidget *parent = 0);
+    EditableValueListDialog(const Interface::Adaptor<IStorage> &storage, const EntityValueReader &reader, QWidget *parent = 0);
     virtual ~EditableValueListDialog();
-
-    virtual void accept();
-    virtual void reject();
 
 protected:
     EntityValue takeValue();
@@ -57,7 +54,7 @@ private:
 
 private:
     TreeViewHandler m_handler;
-    MainEditableValueListWidget m_widget;
+    MainValueWidget m_widget;
 };
 
 #endif /* LVFS_DB_EDITABLEVALUELISTDIALOG_H_ */

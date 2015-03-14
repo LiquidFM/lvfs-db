@@ -17,20 +17,20 @@
  * along with lvfs-db. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LVFS_DB_COMPOSITEVALUEDIALOG_H_
-#define LVFS_DB_COMPOSITEVALUEDIALOG_H_
+#ifndef LVFS_DB_VALUEDIALOG_H_
+#define LVFS_DB_VALUEDIALOG_H_
 
 #include <lvfs-core/tools/widgets/NestedPlainDialog>
-#include "widgets/lvfs_db_CompositeValueWidget.h"
+#include "lvfs_db_ValueWidget.h"
 
 
-class PLATFORM_MAKE_PRIVATE CompositeValueDialog : public NestedPlainDialog
+class PLATFORM_MAKE_PRIVATE EntityValueDialog : public NestedPlainDialog
 {
     Q_OBJECT
 
 public:
-    CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, QWidget *parent = 0);
-    CompositeValueDialog(const Interface::Adaptor<IStorage> &container, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
+    EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, QWidget *parent = 0);
+    EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
 
 protected:
     virtual void addValue();
@@ -39,16 +39,15 @@ protected:
 protected:
     QModelIndex currentIndex() const { return m_mainWidget.currentIndex(); }
 
-    const Interface::Adaptor<IStorage> &container() const { return m_mainWidget.container(); }
-    Interface::Adaptor<IStorage> &container() { return m_mainWidget.container(); }
+    const Interface::Adaptor<IStorage> &storage() const { return m_mainWidget.storage(); }
+    Interface::Adaptor<IStorage> &storage() { return m_mainWidget.storage(); }
 
     const ValueModel &model() const { return m_mainWidget.model(); }
     ValueModel &model() { return m_mainWidget.model(); }
 
-    void doOpenFile(const QModelIndex &index) { m_mainWidget.open(index); }
-    void doAddValue(const QModelIndex &index) { m_mainWidget.addValue(index); }
-    void doRemoveValue(const QModelIndex &index) { m_mainWidget.removeValue(index); }
-    void doEdit(const QModelIndex &index) { m_mainWidget.edit(index); }
+    void doAddValue() { m_mainWidget.addValue(); }
+    void doRemoveValue() { m_mainWidget.removeValue(); }
+    void doEdit() { m_mainWidget.edit(); }
 
 private:
     void openFile1();
@@ -59,14 +58,14 @@ private:
     typedef MouseDoubleClickEventHandler<
                 KeyboardEventHandler<
                     EventHandlerBase<
-                        CompositeValueDialog
+                        EntityValueDialog
                     >
                 >
             > TreeViewHandler;
 
 private:
     TreeViewHandler m_handler;
-    MainCompositeValueWidget m_mainWidget;
+    MainValueWidget m_mainWidget;
 };
 
-#endif /* LVFS_DB_COMPOSITEVALUEDIALOG_H_ */
+#endif /* LVFS_DB_VALUEDIALOG_H_ */

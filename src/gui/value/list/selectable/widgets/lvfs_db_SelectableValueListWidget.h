@@ -20,10 +20,10 @@
 #ifndef LVFS_DB_SELECTABLEVALUELISTWIDGET_H_
 #define LVFS_DB_SELECTABLEVALUELISTWIDGET_H_
 
-#include "../../editable/widgets/lvfs_db_EditableValueListWidget.h"
+#include "../../../lvfs_db_ValueWidget.h"
 
 
-class PLATFORM_MAKE_PRIVATE SelectableValueListWidget : public EditableValueListWidget
+class PLATFORM_MAKE_PRIVATE SelectableValueListWidget : public ValueWidget
 {
 public:
     SelectableValueListWidget(const Interface::Adaptor<IStorage> &container, const EntityValueReader &reader, NestedDialog *parent);

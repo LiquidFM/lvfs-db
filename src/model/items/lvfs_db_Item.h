@@ -34,6 +34,9 @@ public:
     Item(Item *parent = 0);
     virtual ~Item();
 
+    Item *parent() const { return static_cast<Item *>(ListItem::parent()); }
+    void remove(size_type index) { Container::iterator i = m_items.begin() + index; delete (*i); m_items.erase(i); }
+
     virtual bool isPath() const;
     virtual bool isValue() const;
     virtual bool isProperty() const;
