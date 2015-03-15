@@ -47,7 +47,7 @@ ValueModel::ValueModel(const Interface::Adaptor<IStorage> &storage, const Entity
 
         for (auto i : list)
             if (m_storage->schema(i.second.entity()) == IStorage::Path)
-                item->add(new FileItem(i.second, storage.interface()->as<IDirectory>()->entry(i.second.value().asString()), item));
+                item->add(new FileItem(i.second, m_storage.interface()->as<IDirectory>()->entry(i.second.value().asString()), item));
             else
                 item->add(new ValueItem(i.second, item));
     }
@@ -70,10 +70,14 @@ ValueModel::ValueModel(const Interface::Adaptor<IStorage> &storage, const Entity
     {
         m_items.push_back(item = new PropertyItem(i.second));
         const EntityValue::Values &list = CompositeEntityValue(value).values(i.second.entity);
+        ValueModel::Files::const_iterator file;
 
         for (auto i : list)
             if (m_storage->schema(i.second.entity()) == IStorage::Path)
-                item->add(new FileItem(i.second, files.find(i.first)->second, item));
+                if ((file = files.find(i.first)) != files.end())
+                    item->add(new FileItem(i.second, file->second, item));
+                else
+                    item->add(new FileItem(i.second, m_storage.interface()->as<IDirectory>()->entry(i.second.value().asString()), item));
             else
                 item->add(new ValueItem(i.second, item));
     }

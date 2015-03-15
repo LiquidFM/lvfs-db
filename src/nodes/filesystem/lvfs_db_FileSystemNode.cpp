@@ -68,12 +68,15 @@ void FileSystemNode::closed(const Interface::Holder &view)
     m_node->closed(view);
 }
 
-void FileSystemNode::accept(const Interface::Holder &view, Files &files)
+Interface::Holder FileSystemNode::accept(const Interface::Holder &view, Files &files)
 {
     using namespace LiquidDb;
-    m_node->accept(view, files);
+    Interface::Holder res = m_node->accept(view, files);
 
-    if (!files.empty() && m_storage->transaction())
+    if (!res.isValid())
+        return Interface::Holder();
+
+    if (m_storage->transaction())
     {
         Entity entity(ChooseEntityDialog::chooseFile(m_storage, view->as<Core::IView>()->widget()));
 
@@ -89,15 +92,17 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
                 char buffer[Module::MaxUriLength];
                 char prefix[Module::MaxUriLength];
 
-                if (::strcmp(file()->as<IEntry>()->location(), m_storage->file()->as<IEntry>()->location()) == 0)
+                IEntry *storageEntry = m_storage->file()->as<IEntry>();
+                const char *filePath = file()->as<IEntry>()->location();
+
+                if (::strcmp(filePath, storageEntry->location()) == 0)
                     prefix[0] = 0;
                 else
                 {
-                    if (UNLIKELY(std::snprintf(prefix, sizeof(prefix), "%s/", file()->as<IEntry>()->location() + ::strlen(m_storage->file()->as<IEntry>()->location()) + 1) < 0))
+                    if (UNLIKELY(std::snprintf(prefix, sizeof(prefix), "%s/", filePath + ::strlen(storageEntry->location()) + 1) < 0))
                     {
                         m_storage->rollback();
-                        files.clear();
-                        return;
+                        return Interface::Holder();
                     }
                 }
 
@@ -111,8 +116,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
                             if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, (*i)->as<IEntry>()->title()) < 0))
                             {
                                 m_storage->rollback();
-                                files.clear();
-                                return;
+                                return Interface::Holder();
                             }
 
                             localValue = m_storage->addValue(path, buffer);
@@ -126,8 +130,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
                             {
                                 QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
                                 m_storage->rollback();
-                                files.clear();
-                                return;
+                                return Interface::Holder();
                             }
                         }
 
@@ -142,7 +145,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
                         m_storage->rollback();
                     else
                         if (m_storage->commit())
-                            return;
+                            return res;
                         else
                         {
                             QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
@@ -164,7 +167,7 @@ void FileSystemNode::accept(const Interface::Holder &view, Files &files)
     else
         QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
 
-    files.clear();
+    return Interface::Holder();
 }
 
 int FileSystemNode::refs() const

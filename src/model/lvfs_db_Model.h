@@ -47,6 +47,8 @@ public:
         virtual size_type size() const;
         virtual size_type indexOf(Item *item) const;
 
+        void clear();
+
     protected:
         Container m_items;
     };

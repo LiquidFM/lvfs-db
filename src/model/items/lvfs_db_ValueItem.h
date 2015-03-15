@@ -40,6 +40,10 @@ public:
 
     const EntityValue &value() const { return m_value; }
     EntityValue take() { EntityValue res(m_value); m_value = EntityValue(); return res; }
+    void reset(const Interface::Adaptor<IStorage> &storage, const EntityValue &value);
+
+protected:
+    void init(const Interface::Adaptor<IStorage> &storage);
 
 protected:
     EntityValue m_value;

@@ -29,8 +29,7 @@ Model::ListItem::ListItem(Item *parent) :
 
 Model::ListItem::~ListItem()
 {
-    for (auto &i : m_items)
-        delete i;
+    clear();
 }
 
 Model::Item *Model::ListItem::at(size_type index) const
@@ -52,6 +51,13 @@ Model::ListItem::size_type Model::ListItem::indexOf(Item *item) const
     return InvalidIndex;
 }
 
+void Model::ListItem::clear()
+{
+    for (auto &i : m_items)
+        delete i;
+
+    m_items.clear();
+}
 
 Model::Model(QObject *parent)
 {}

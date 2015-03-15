@@ -97,6 +97,11 @@ bool RootView::setNode(const Interface::Holder &node)
     return false;
 }
 
+QModelIndex RootView::currentIndex() const
+{
+    return m_view.selectionModel()->currentIndex();
+}
+
 void RootView::select(const QModelIndex &index, bool expand)
 {
     QModelIndex toBeSelected = index;

@@ -82,9 +82,9 @@ void RootNode::closed(const Interface::Holder &view)
     m_views.erase(view);
 }
 
-void RootNode::accept(const Interface::Holder &view, Files &files)
+Interface::Holder RootNode::accept(const Interface::Holder &view, Files &files)
 {
-    files.clear();
+    return Interface::Holder();
 }
 
 void RootNode::copy(const Interface::Holder &view, const Interface::Holder &dest, Files &files, bool move)

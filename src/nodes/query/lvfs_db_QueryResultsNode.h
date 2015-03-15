@@ -42,7 +42,7 @@ public: /* Core::INode */
     virtual void refresh(int depth = 0);
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
-    virtual void accept(const Interface::Holder &view, Core::INode::Files &files);
+    virtual Interface::Holder accept(const Interface::Holder &view, Core::INode::Files &files);
 
     virtual void clear();
 

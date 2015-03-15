@@ -35,6 +35,10 @@ public:
     virtual ~Item();
 
     Item *parent() const { return static_cast<Item *>(ListItem::parent()); }
+
+    template <typename R = Item>
+    R *at(size_type index) const { return static_cast<R *>(ListItem::at(index)); }
+
     void remove(size_type index) { Container::iterator i = m_items.begin() + index; delete (*i); m_items.erase(i); }
 
     virtual bool isPath() const;

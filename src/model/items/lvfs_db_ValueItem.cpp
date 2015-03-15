@@ -38,19 +38,7 @@ ValueItem::ValueItem(const Interface::Adaptor<IStorage> &storage, const EntityVa
     m_value(value),
     m_cache(toQVariant(m_value.value()))
 {
-    PropertyItem *item;
-
-    for (auto i : m_value.entity().properties())
-    {
-        m_items.push_back(item = new PropertyItem(i.second, this));
-        const EntityValue::Values &list = CompositeEntityValue(m_value).values(i.second.entity);
-
-        for (auto i : list)
-            if (storage->schema(i.second.entity()) == IStorage::Path)
-                item->add(new FileItem(i.second, storage.interface()->as<IDirectory>()->entry(i.second.value().asString()), item));
-            else
-                item->add(new ValueItem(i.second, item));
-    }
+    init(storage);
 }
 
 ValueItem::~ValueItem()
@@ -67,6 +55,33 @@ QVariant ValueItem::data(qint32 column, qint32 role) const
 bool ValueItem::isValue() const
 {
     return true;
+}
+
+void ValueItem::reset(const Interface::Adaptor<IStorage> &storage, const EntityValue &value)
+{
+    clear();
+
+    m_value = value;
+    m_cache = toQVariant(m_value.value());
+
+    init(storage);
+}
+
+void ValueItem::init(const Interface::Adaptor<IStorage> &storage)
+{
+    PropertyItem *item;
+
+    for (auto i : m_value.entity().properties())
+    {
+        m_items.push_back(item = new PropertyItem(i.second, this));
+        const EntityValue::Values &list = CompositeEntityValue(m_value).values(i.second.entity);
+
+        for (auto i : list)
+            if (storage->schema(i.second.entity()) == IStorage::Path)
+                item->add(new FileItem(i.second, storage.interface()->as<IDirectory>()->entry(i.second.value().asString()), item));
+            else
+                item->add(new ValueItem(i.second, item));
+    }
 }
 
 }}

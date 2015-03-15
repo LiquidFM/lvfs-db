@@ -18,6 +18,7 @@
  */
 
 #include "lvfs_db_QueryResultsNode.h"
+
 #include "../../model/items/lvfs_db_FileItem.h"
 #include "../../model/items/lvfs_db_ValueItem.h"
 #include "../../model/items/lvfs_db_PropertyItem.h"
@@ -25,6 +26,8 @@
 #include "../../gui/value/lvfs_db_SelectValueDialog.h"
 #include "../../lvfs_db_common.h"
 
+#include <lvfs/IEntry>
+#include <lvfs/IDirectory>
 #include <lvfs-core/IView>
 #include <lvfs-core/models/Qt/IView>
 
@@ -51,7 +54,25 @@ QueryResultsNode::~QueryResultsNode()
 
 void QueryResultsNode::refresh(int depth)
 {
+    if (m_reader.entity().type() == Entity::Composite)
+    {
+        QModelIndex idx;
+        PropertyItem *property;
 
+        for (auto &item : ValueModel::m_items)
+            for (Db::Item::size_type i = 0, size = item->size(); i < size; ++i)
+                if (m_storage->schema((property = static_cast<PropertyItem *>(item->at(i)))->entity()) == IStorage::Path)
+                {
+                    for (Db::Item::size_type i = 0, size = property->size(); i < size; ++i)
+                        if (property->at<FileItem>(i)->refresh(m_storage))
+                        {
+                            idx = index(property->at<FileItem>(i));
+                            emit dataChanged(idx, idx);
+                        }
+
+                    break;
+                }
+    }
 }
 
 void QueryResultsNode::opened(const Interface::Holder &view)
@@ -64,9 +85,125 @@ void QueryResultsNode::closed(const Interface::Holder &view)
 
 }
 
-void QueryResultsNode::accept(const Interface::Holder &view, Core::INode::Files &files)
+Interface::Holder QueryResultsNode::accept(const Interface::Holder &view, Core::INode::Files &files)
 {
-    files.clear();
+    QModelIndex index = view->as<Core::Qt::IView>()->currentIndex();
+
+    if (index.isValid())
+    {
+        Db::Item *item = static_cast<Db::Item *>(index.internalPointer());
+        PropertyItem *property;
+
+        if (item->parent())
+            do
+                item = item->parent();
+            while (item->parent());
+
+        for (Db::Item::size_type i = 0, size = item->size(); i < size; ++i)
+            if (m_storage->schema((property = item->at<PropertyItem>(i))->entity()) == IStorage::Path)
+            {
+                char buffer[Module::MaxUriLength];
+                char prefix[Module::MaxUriLength];
+
+                if (property->size() > 0)
+                {
+                    ::strcpy(prefix, property->at<ValueItem>(0)->value().value().asString());
+
+                    if (char * tok = ::strrchr(prefix, '/'))
+                        tok[1] = 0;
+                    else
+                        prefix[0] = 0;
+                }
+                else
+                    prefix[0] = 0;
+
+                Interface::Holder dest = m_storage->file()->as<IDirectory>()->entry(prefix);
+
+                if (!dest.isValid())
+                {
+                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->file()->as<IDirectory>()->lastError().description()));
+                    return Interface::Holder();
+                }
+
+                if (m_storage->transaction())
+                {
+                    EntityValue localValue;
+                    EntityValue::List list;
+                    ValueModel::Files dbFiles;
+
+                    for (auto i = files.begin(), end = files.end(); i != end; ++i)
+                    {
+                        if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, (*i)->as<IEntry>()->title()) < 0))
+                        {
+                            m_storage->rollback();
+                            return Interface::Holder();
+                        }
+
+                        localValue = m_storage->addValue(property->entity(), buffer);
+
+                        if (localValue.isValid())
+                        {
+                            list.push_back(localValue);
+                            dbFiles[localValue.id()] = (*i);
+                        }
+                        else
+                        {
+                            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                            m_storage->rollback();
+                            return Interface::Holder();
+                        }
+                    }
+
+                    if (m_storage->addValue(static_cast<ValueItem *>(item)->value(), list))
+                    {
+                        EntityValueDialog dialog(m_storage, static_cast<ValueItem *>(item)->value(), dbFiles, view->as<Core::IView>()->widget());
+
+                        if (dialog.exec() != EntityValueDialog::Accepted)
+                        {
+                            m_storage->rollback();
+                            return Interface::Holder();
+                        }
+                        else
+                            if (m_storage->commit())
+                            {
+                                index = this->index(item);
+                                localValue = static_cast<ValueItem *>(item)->value();
+
+                                beginRemoveRows(index, 0, item->size());
+                                static_cast<ValueItem *>(item)->clear();
+                                endRemoveRows();
+
+                                beginInsertColumns(index, 0, localValue.entity().properties().size() - 1);
+                                static_cast<ValueItem *>(item)->reset(m_storage, localValue);
+                                endInsertRows();
+
+                                return dest;
+                            }
+                            else
+                            {
+                                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                                m_storage->rollback();
+                                return Interface::Holder();
+                            }
+
+                        m_storage->setEditorGeometry(static_cast<ValueItem *>(item)->value().entity(), fromQRect(dialog.geometry()));
+                    }
+                    else
+                    {
+                        QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                        m_storage->rollback();
+                        return Interface::Holder();
+                    }
+                }
+                else
+                {
+                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                    return Interface::Holder();
+                }
+            }
+    }
+
+    return Interface::Holder();
 }
 
 void QueryResultsNode::clear()
