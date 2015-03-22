@@ -188,7 +188,7 @@ ValueWidgetPrivate::ValueWidgetPrivate(const Interface::Adaptor<IStorage> &stora
 
 void ValueWidgetPrivate::edit()
 {
-    m_view.edit(currentIndex());
+    m_view.edit(m_view.selectionModel()->currentIndex());
 }
 
 bool ValueWidgetPrivate::dblClick()
@@ -276,6 +276,28 @@ void ValueWidgetPrivate::removeValue()
 void ValueWidgetPrivate::setFocusToFilter()
 {
     m_filter.setFocus();
+    m_filter.selectAll();
+}
+
+void ValueWidgetPrivate::selectPathProperty()
+{
+    QModelIndex index = currentIndex();
+
+    if (!index.isValid())
+        return;
+    else
+        index = m_model.pathPropertyIndex(index);
+
+    if (!index.isValid())
+        return;
+    else
+        index = m_proxy.mapFromSource(index);
+
+    m_view.setFocus();
+    m_view.scrollTo(index, QAbstractItemView::PositionAtCenter);
+    m_view.selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Columns);
+    m_view.selectionModel()->setCurrentIndex(index, QItemSelectionModel::ClearAndSelect);
+    m_view.expand(index);
 }
 
 void ValueWidgetPrivate::doAddValue()
@@ -374,7 +396,12 @@ void ValueWidgetPrivate::setFilter()
     m_proxy.setFilter(m_filter.text());
 
     if (!m_filter.text().isEmpty())
+    {
         m_view.setFocus();
+
+        if (m_model.canFetchMore(QModelIndex()))
+            m_model.fetchMore(QModelIndex());
+    }
 }
 
 void ValueWidgetPrivate::clearFilter()
@@ -547,6 +574,12 @@ void ValueWidget::setFocusToFilter()
     m_private.setFocusToFilter();
 }
 
+void ValueWidget::enterPressed()
+{
+    if (!m_private.dblClick())
+        m_private.selectPathProperty();
+}
+
 void ValueWidget::init()
 {
     m_handler.registerMouseDoubleClickEventHandler(&ValueWidget::dblClick);
@@ -554,7 +587,10 @@ void ValueWidget::init()
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Insert, &ValueWidget::addValue);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Delete, &ValueWidget::removeValue);
     m_handler.registerShortcut(Qt::CTRL,       Qt::Key_F,      &ValueWidget::setFocusToFilter);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Return, &ValueWidget::enterPressed);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Enter,  &ValueWidget::enterPressed);
     m_handler.registerShortcut(Qt::CTRL,       Qt::Key_Return, &ValueWidget::accept);
+    m_handler.registerShortcut(Qt::CTRL,       Qt::Key_Enter,  &ValueWidget::accept);
 
     m_private.view().setToolTip(tr("INS - add value\nDEL - remove value\nCTRL+F - activate filter field"));
     setCentralWidget(&m_private);

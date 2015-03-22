@@ -19,6 +19,7 @@
 
 #include "lvfs_db_ValueDelegate.h"
 
+#include "lvfs_db_ValueModel.h"
 #include "items/lvfs_db_FileItem.h"
 #include "items/lvfs_db_ValueItem.h"
 #include "items/lvfs_db_PropertyItem.h"
@@ -39,9 +40,11 @@ ValueDelegate::ValueDelegate(const Interface::Adaptor<IStorage> &storage, const 
 
 QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    if (static_cast<Item *>(index.internalPointer())->isValue())
+    QModelIndex idx(mapToSource(index));
+
+    if (static_cast<Item *>(idx.internalPointer())->isValue())
     {
-        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(idx.internalPointer());
 
         switch (item->value().entity().type())
         {
@@ -79,7 +82,10 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
                         m_storage->rollback();
                     else
                         if (m_storage->commit())
+                        {
                             CompositeEntityValue(item->value()).resetValue();
+                            const_cast<ValueModel *>(static_cast<const ValueModel *>(idx.model()))->update(idx);
+                        }
                         else
                         {
                             m_storage->rollback();
@@ -96,18 +102,17 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
                 break;
         }
     }
-    else
-        if (static_cast<Item *>(index.internalPointer())->isProperty())
-            return new Editor<QString>::type(parent);
 
     return NULL;
 }
 
 void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    if (static_cast<Item *>(index.internalPointer())->isValue())
+    QModelIndex idx(mapToSource(index));
+
+    if (static_cast<Item *>(idx.internalPointer())->isValue())
     {
-        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(idx.internalPointer());
 
         switch (item->value().entity().type())
         {
@@ -115,7 +120,7 @@ void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
 //                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Rating)
 //                    EditorValue<typename EntityValueType<Entity::Int>::type>::setValue(editor, index.data(Qt::DisplayRole));
 //                else
-                    EditorValue<typename EntityValueType<Entity::Int>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                    EditorValue<typename EntityValueType<Entity::Int>::type>::setValue(editor, idx.data(Qt::DisplayRole));
 
                 break;
 
@@ -123,24 +128,24 @@ void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
 //                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
 //                    EditorValue<typename EntityValueType<Entity::String>::type>::setValue(editor, index.data(Qt::DisplayRole));
 //                else
-                    EditorValue<typename EntityValueType<Entity::String>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                    EditorValue<typename EntityValueType<Entity::String>::type>::setValue(editor, idx.data(Qt::DisplayRole));
 
                 break;
 
             case Entity::Date:
-                EditorValue<typename EntityValueType<Entity::Date>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                EditorValue<typename EntityValueType<Entity::Date>::type>::setValue(editor, idx.data(Qt::DisplayRole));
                 break;
 
             case Entity::Time:
-                EditorValue<typename EntityValueType<Entity::Time>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                EditorValue<typename EntityValueType<Entity::Time>::type>::setValue(editor, idx.data(Qt::DisplayRole));
                 break;
 
             case Entity::DateTime:
-                EditorValue<typename EntityValueType<Entity::DateTime>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                EditorValue<typename EntityValueType<Entity::DateTime>::type>::setValue(editor, idx.data(Qt::DisplayRole));
                 break;
 
             case Entity::Memo:
-                EditorValue<typename EntityValueType<Entity::Memo>::type>::setValue(editor, index.data(Qt::DisplayRole));
+                EditorValue<typename EntityValueType<Entity::Memo>::type>::setValue(editor, idx.data(Qt::DisplayRole));
                 break;
 
             case Entity::Composite:
@@ -148,15 +153,15 @@ void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
                 break;
         }
     }
-    else
-        EditorValue<QString>::setValue(editor, static_cast<PropertyItem *>(index.internalPointer())->name());
 }
 
 void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    if (static_cast<Item *>(index.internalPointer())->isValue())
+    QModelIndex idx(mapToSource(index));
+
+    if (static_cast<Item *>(idx.internalPointer())->isValue())
     {
-        ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
+        ValueItem *item = static_cast<ValueItem *>(idx.internalPointer());
         ::EFC::Variant value;
 
         switch (item->value().entity().type())
@@ -229,7 +234,9 @@ void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
 //            else
                 if (m_storage->updateValue(item->value(), value))
                 {
-                    if (!m_storage->commit())
+                    if (m_storage->commit())
+                        const_cast<ValueModel *>(static_cast<const ValueModel *>(idx.model()))->update(idx);
+                    else
                     {
                         QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
                         m_storage->rollback();
@@ -243,32 +250,11 @@ void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, con
         else
             QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
     }
-    else
-        if (m_storage->transaction())
-        {
-            PropertyItem *property = static_cast<PropertyItem *>(index.internalPointer());
+}
 
-            if (m_storage->renameProperty(m_entity, property->entity(), fromUnicode(EditorValue<QString>::value(editor)).data()))
-            {
-                if (m_storage->commit())
-                    property->setName(EditorValue<QString>::value(editor));
-                else
-                {
-                    QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
-                    m_storage->rollback();
-                }
-            }
-            else
-            {
-                QMessageBox::critical(
-                            editor,
-                            tr("Failed to rename property \"%1\"").arg(property->name()),
-                            toUnicode(m_storage->lastError()));
-                m_storage->rollback();
-            }
-        }
-        else
-            QMessageBox::critical(editor, tr("Error"), toUnicode(m_storage->lastError()));
+QModelIndex ValueDelegate::mapToSource(const QModelIndex &index) const
+{
+    return static_cast<const QSortFilterProxyModel *>(index.model())->mapToSource(index);
 }
 
 }}

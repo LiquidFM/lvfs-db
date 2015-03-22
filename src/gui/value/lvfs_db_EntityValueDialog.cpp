@@ -73,6 +73,12 @@ void EntityValueDialog::setFocusToFilter()
     m_mainWidget.setFocusToFilter();
 }
 
+void EntityValueDialog::enterPressed()
+{
+    if (!m_mainWidget.dblClick())
+        m_mainWidget.selectPathProperty();
+}
+
 void EntityValueDialog::init(const QRect &geometry)
 {
     if (geometry.isValid())
@@ -83,7 +89,10 @@ void EntityValueDialog::init(const QRect &geometry)
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Insert, &EntityValueDialog::addValue);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Delete, &EntityValueDialog::removeValue);
     m_handler.registerShortcut(Qt::CTRL,       Qt::Key_F,      &EntityValueDialog::setFocusToFilter);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Return, &EntityValueDialog::enterPressed);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Enter,  &EntityValueDialog::enterPressed);
     m_handler.registerShortcut(Qt::CTRL,       Qt::Key_Return, &EntityValueDialog::accept);
+    m_handler.registerShortcut(Qt::CTRL,       Qt::Key_Enter,  &EntityValueDialog::accept);
 
     setCentralWidget(&m_mainWidget);
 }

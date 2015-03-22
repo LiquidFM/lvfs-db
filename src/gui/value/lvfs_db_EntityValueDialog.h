@@ -42,6 +42,7 @@ private:
     void addValue();
     void removeValue();
     void setFocusToFilter();
+    void enterPressed();
 
 private:
     void init(const QRect &geometry);

@@ -121,6 +121,32 @@ bool ValueModel::canFetchMore(const QModelIndex &parent) const
     return m_reader.isValid() && !parent.isValid() && !m_reader.eof();
 }
 
+QModelIndex ValueModel::pathPropertyIndex(const QModelIndex &index) const
+{
+    ASSERT(index.isValid());
+    Db::Item *item = static_cast<Db::Item *>(index.internalPointer());
+
+    if (item->parent())
+        do
+            item = item->parent();
+        while (item->parent());
+
+    if (item->isProperty())
+    {
+        for (Container::const_iterator i = m_items.begin(); i != m_items.end(); ++i)
+            if (m_storage->schema(static_cast<PropertyItem *>(*i)->entity()) == IStorage::Path)
+                return Model::index(*i);
+    }
+    else
+    {
+        for (int i = 0, size = item->size(); i < size; ++i)
+            if (m_storage->schema(static_cast<PropertyItem *>(item->at(i))->entity()) == IStorage::Path)
+                return Model::index(item->at(i));
+    }
+
+    return QModelIndex();
+}
+
 EntityValue ValueModel::take(const QModelIndex &index)
 {
     EntityValue res;
@@ -183,7 +209,21 @@ void ValueModel::remove(const QModelIndex &index)
 
 void ValueModel::update(const QModelIndex &index)
 {
-    emit dataChanged(index, index);
+    ASSERT(static_cast<Db::Item *>(index.internalPointer())->isValue());
+    ValueItem *item = static_cast<ValueItem *>(index.internalPointer());
+
+    if (item->size() > 0)
+    {
+        beginRemoveRows(index, 0, item->size());
+        item->clear();
+        endRemoveRows();
+
+        beginInsertColumns(index, 0, item->value().entity().properties().size() - 1);
+        item->reset(m_storage, item->value());
+        endInsertRows();
+    }
+    else
+        item->reset(m_storage, item->value());
 }
 
 }}

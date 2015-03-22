@@ -252,15 +252,19 @@ Interface::Holder QueryResultsNode::activated(const Interface::Holder &view, con
     if (item->isPath())
         static_cast<FileItem *>(item)->open();
     else
-        if (item->parent() == NULL && m_reader.entity().type() == Entity::Composite)
-        {
-            for (int i = 0, size = item->size(); i < size; ++i)
-                if (m_storage->schema(static_cast<PropertyItem *>(item->at(i))->entity()) == IStorage::Path)
-                {
-                    view->as<Core::Qt::IView>()->select(this->index(item->at(i)), true);
-                    break;
-                }
-        }
+    {
+        if (item->parent())
+            do
+                item = item->parent();
+            while (item->parent());
+
+        for (int i = 0, size = item->size(); i < size; ++i)
+            if (m_storage->schema(static_cast<PropertyItem *>(item->at(i))->entity()) == IStorage::Path)
+            {
+                view->as<Core::Qt::IView>()->select(this->index(item->at(i)), true);
+                break;
+            }
+    }
 
     return Interface::Holder();
 }

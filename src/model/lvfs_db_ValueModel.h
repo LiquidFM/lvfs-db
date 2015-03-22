@@ -47,6 +47,8 @@ public:
     virtual void fetchMore(const QModelIndex &parent);
     virtual bool canFetchMore(const QModelIndex &parent = QModelIndex()) const;
 
+    QModelIndex pathPropertyIndex(const QModelIndex &index) const;
+
     using Model::indexOf;
     EntityValue take(const QModelIndex &index);
 

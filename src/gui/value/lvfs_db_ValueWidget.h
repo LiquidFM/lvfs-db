@@ -97,6 +97,7 @@ public:
     void addValue();
     void removeValue();
     void setFocusToFilter();
+    void selectPathProperty();
 
 private:
     void doAddValue();
@@ -161,6 +162,7 @@ public:
     void removeValue() { m_private.removeValue(); }
     void setFocusToFilter() { m_private.setFocusToFilter(); }
     void setViewToolTip(const QString &value) { m_private.view().setToolTip(value); }
+    void selectPathProperty() { m_private.selectPathProperty(); }
 
 private:
     ValueWidgetPrivate m_private;
@@ -190,6 +192,7 @@ private:
     void addValue();
     void removeValue();
     void setFocusToFilter();
+    void enterPressed();
 
 private:
     void init();

@@ -39,6 +39,9 @@ public:
     virtual void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
 private:
+    QModelIndex mapToSource(const QModelIndex &index) const;
+
+private:
     const Interface::Adaptor<IStorage> &m_storage;
     const Entity &m_entity;
 };
