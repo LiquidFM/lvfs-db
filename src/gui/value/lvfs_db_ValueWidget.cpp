@@ -422,8 +422,10 @@ void ValueWidgetPrivate::selectValue(const QModelIndex &index)
         m_filter.setText(toUnicode(static_cast<ValueItem *>(item)->value().value().asString()));
 }
 
-void ValueWidgetPrivate::setCurrentIndex(const QModelIndex &index) const
+void ValueWidgetPrivate::setCurrentIndex(const QModelIndex &index)
 {
+    m_filter.setText(QString());
+    setFilter();
     m_view.selectionModel()->setCurrentIndex(m_proxy.mapFromSource(index), QItemSelectionModel::ClearAndSelect);
 }
 

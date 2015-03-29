@@ -109,7 +109,7 @@ private Q_SLOTS:
     void selectValue(const QModelIndex &index);
 
 private:
-    void setCurrentIndex(const QModelIndex &index) const;
+    void setCurrentIndex(const QModelIndex &index);
 
 private:
     void init();
