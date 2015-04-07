@@ -46,9 +46,6 @@ public:
     virtual const Geometry &geometry() const = 0;
     virtual const Sorting &sorting() const = 0;
 
-    virtual QModelIndex currentIndex() const = 0;
-    virtual void setCurrentIndex(const QModelIndex &index) = 0;
-
     virtual Interface::Holder activated(const Interface::Holder &view, const QModelIndex &index) = 0;
     virtual Interface::Holder search(const Interface::Holder &view, const QModelIndex &index) = 0;
     virtual void insert(const Interface::Holder &view, const QModelIndex &index) = 0;

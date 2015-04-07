@@ -67,18 +67,17 @@ void RootNode::refresh(int depth)
         for (auto i : m_container->entities())
             doAdd(i.second);
     }
-
-    for (auto i : m_views)
-        i->as<Core::Qt::IView>()->select(currentIndex());
 }
 
 void RootNode::opened(const Interface::Holder &view)
 {
     m_views.insert(view);
+    view->as<Core::Qt::IView>()->select(m_currentIndex);
 }
 
 void RootNode::closed(const Interface::Holder &view)
 {
+    m_currentIndex = view->as<Core::Qt::IView>()->currentIndex();
     m_views.erase(view);
 }
 
@@ -155,16 +154,6 @@ const RootNode::Geometry &RootNode::geometry() const
 const RootNode::Sorting &RootNode::sorting() const
 {
     return m_sorting;
-}
-
-QModelIndex RootNode::currentIndex() const
-{
-    return m_currentIndex;
-}
-
-void RootNode::setCurrentIndex(const QModelIndex &index)
-{
-    m_currentIndex = index;
 }
 
 Interface::Holder RootNode::activated(const Interface::Holder &view, const QModelIndex &index)

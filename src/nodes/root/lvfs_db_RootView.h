@@ -48,11 +48,13 @@ public:
     virtual void setMainView(const Interface::Holder &mainView);
 
     virtual const Interface::Holder &node() const;
-    virtual bool setNode(const Interface::Holder &node);
+    virtual void setNode(const Interface::Holder &node);
+
+    virtual bool isAbleToView(const Interface::Holder &node) const;
 
     /* Core::Qt::IView */
     virtual QModelIndex currentIndex() const;
-    virtual void select(const QModelIndex &index, bool expand);
+    virtual void select(const QModelIndex &index, bool expand = false);
 
 private:
     void goUpShortcut();

@@ -66,9 +66,6 @@ public: /* Db::INode */
     virtual const Geometry &geometry() const;
     virtual const Sorting &sorting() const;
 
-    virtual QModelIndex currentIndex() const;
-    virtual void setCurrentIndex(const QModelIndex &index);
-
     virtual Interface::Holder activated(const Interface::Holder &view, const QModelIndex &index);
     virtual Interface::Holder search(const Interface::Holder &view, const QModelIndex &index);
     virtual void insert(const Interface::Holder &view, const QModelIndex &index);

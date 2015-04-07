@@ -75,26 +75,25 @@ const Interface::Holder &RootView::node() const
     return m_node;
 }
 
-bool RootView::setNode(const Interface::Holder &node)
+void RootView::setNode(const Interface::Holder &node)
 {
     if (!node.isValid())
     {
         m_node.reset();
-        return true;
+        return;
     }
 
-    Core::INode *coreNode = node->as<Core::INode>();
+    ASSERT(node->as<Db::INode>() != NULL);
+    Db::INode *dbNode = node->as<Db::INode>();
 
-    if (Db::INode *dbNode = node->as<Db::INode>())
-    {
-        m_node = node;
-        m_view.setModel(dbNode->model());
-        m_view.sortByColumn(dbNode->sorting().first, dbNode->sorting().second);
+    m_node = node;
+    m_view.setModel(dbNode->model());
+    m_view.sortByColumn(dbNode->sorting().first, dbNode->sorting().second);
+}
 
-        return true;
-    }
-
-    return false;
+bool RootView::isAbleToView(const Interface::Holder &node) const
+{
+    return node->as<Db::INode>();
 }
 
 QModelIndex RootView::currentIndex() const
