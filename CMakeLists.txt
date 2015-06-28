@@ -1,7 +1,7 @@
 project (lvfs-db)
 
 # Project header
-project_cxx_library_header_default ()
+project_library_header_default ()
 
 # 3rdparty
 list (APPEND ${PROJECT_NAME}_LIBS brolly)
