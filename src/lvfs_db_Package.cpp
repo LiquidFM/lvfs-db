@@ -37,6 +37,11 @@ const char *Package::name() const
     return "DB";
 }
 
+Settings::Scope *Package::settings() const
+{
+    return NULL;
+}
+
 const Package::Plugin **Package::contentPlugins() const
 {
     static const Db::Plugin plugin;
