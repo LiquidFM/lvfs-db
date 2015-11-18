@@ -22,7 +22,7 @@
 
 #include <QtGui/QIcon>
 #include <QtCore/QCoreApplication>
-#include "lvfs_db_SubFileItem.h"
+#include "lvfs_db_ValueItem.h"
 
 
 namespace LVFS {
@@ -30,11 +30,13 @@ namespace Db {
 
 class PLATFORM_MAKE_PRIVATE FileItem : public ValueItem
 {
+    Q_DECLARE_TR_FUNCTIONS(FileItem)
+
 public:
     FileItem(const EntityValue &value, const Interface::Holder &file, Item *parent = 0);
     virtual ~FileItem();
 
-    const Interface::Holder &file() const { return m_item.file(); }
+    const Interface::Holder &file() const { return m_file; }
     bool refresh(const Interface::Adaptor<IStorage> &storage);
 
     virtual QVariant data(qint32 column, qint32 role) const;
@@ -43,13 +45,11 @@ public:
 
     virtual void open() const;
 
-public: /* Model::ListItem */
-    virtual Model::Item *at(size_type index) const;
-    virtual size_type size() const;
-    virtual size_type indexOf(Model::Item *item) const;
-
 private:
-    SubFileItem m_item;
+    Interface::Holder m_file;
+    QString m_name;
+    QString m_toolTip;
+    QIcon m_icon;
 };
 
 }}

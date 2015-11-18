@@ -19,7 +19,12 @@
 
 #include "lvfs_db_FileItem.h"
 
-#include <lvfs/IDirectory>
+#include <lvfs/Module>
+#include <lvfs/IEntry>
+#include <lvfs/IApplication>
+#include <lvfs/IApplications>
+
+#include <cstring>
 
 
 namespace LVFS {
@@ -27,21 +32,37 @@ namespace Db {
 
 FileItem::FileItem(const EntityValue &value, const Interface::Holder &file, Item *parent) :
     ValueItem(value, parent),
-    m_item(value, file, this)
-{}
+    m_file(file)
+{
+    if (m_file.isValid())
+    {
+        m_name = toUnicode(m_file->as<IEntry>()->title());
+        m_icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+        m_toolTip = toUnicode(m_file->as<IEntry>()->type()->name());
+    }
+    else
+    {
+        m_name = toUnicode(value.value().asString());
+        m_icon.addFile(toUnicode(Module::desktop().typeOfUnknownFile()->as<IType>()->icon()->as<IEntry>()->location()), QSize(16, 16));
+        m_toolTip = tr("File does not exists!");
+    }
+}
 
 FileItem::~FileItem()
 {}
 
 bool FileItem::refresh(const Interface::Adaptor<IStorage> &storage)
 {
-    if (!file().isValid())
+    if (!m_file.isValid())
     {
-        Interface::Holder file = storage->file()->as<IDirectory>()->entry(value().value().asString());
+        m_file = storage->file()->as<IDirectory>()->entry(value().value().asString());
 
-        if (file.isValid())
+        if (m_file.isValid())
         {
-            m_item = SubFileItem(value(), file, this);
+            m_name = toUnicode(m_file->as<IEntry>()->title());
+            m_icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
+            m_toolTip = toUnicode(m_file->as<IEntry>()->type()->name());
+
             return true;
         }
     }
@@ -51,7 +72,20 @@ bool FileItem::refresh(const Interface::Adaptor<IStorage> &storage)
 
 QVariant FileItem::data(qint32 column, qint32 role) const
 {
-    return m_item.data(column, role);
+    switch (role)
+    {
+        case Qt::EditRole:
+        case Qt::DisplayRole:
+            return m_name;
+        case Qt::DecorationRole:
+            return m_icon;
+        case Qt::TextAlignmentRole:
+            return Qt::AlignLeft;
+        case Qt::ToolTipRole:
+            return m_toolTip;
+    }
+
+    return QVariant();
 }
 
 bool FileItem::isPath() const
@@ -61,22 +95,22 @@ bool FileItem::isPath() const
 
 void FileItem::open() const
 {
-    return m_item.open();
-}
+    if (::strcmp(m_file->as<IEntry>()->type()->name(), Module::DirectoryTypeName) != 0)
+    {
+        Interface::Holder apps = Module::desktop().applications(m_file->as<IEntry>()->type());
 
-Model::Item *FileItem::at(size_type index) const
-{
-    return m_item.at(index);
-}
+        if (apps.isValid())
+        {
+            ASSERT(apps->as<IApplications>() != NULL);
+            IApplications::const_iterator iterator = apps->as<IApplications>()->begin();
 
-FileItem::size_type FileItem::size() const
-{
-    return m_item.size();
-}
-
-FileItem::size_type FileItem::indexOf(Model::Item *item) const
-{
-    return m_item.indexOf(item);
+            if (iterator != apps->as<IApplications>()->end())
+            {
+                ASSERT((*iterator)->as<IApplication>() != NULL);
+                (*iterator)->as<IApplication>()->open(m_file->as<IEntry>());
+            }
+        }
+    }
 }
 
 }}
