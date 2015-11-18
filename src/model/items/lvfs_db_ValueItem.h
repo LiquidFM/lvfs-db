@@ -53,4 +53,3 @@ protected:
 }}
 
 #endif /* LVFS_DB_VALUEITEM_H_ */
-
