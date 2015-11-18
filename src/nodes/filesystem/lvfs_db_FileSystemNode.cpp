@@ -26,6 +26,7 @@
 #include <lvfs/Module>
 #include <lvfs/IEntry>
 #include <lvfs-core/IView>
+#include <lvfs-core/INodeFactory>
 #include <QtGui/QMessageBox>
 
 #include <cstdio>
@@ -192,7 +193,17 @@ void FileSystemNode::clear()
 
 Interface::Holder FileSystemNode::node(const Interface::Holder &file) const
 {
-    return m_node->node(file);
+    Interface::Holder node(m_node->node(file));
+
+    if (!node.isValid())
+    {
+        node = file->as<Core::INodeFactory>()->createNode(file, Interface::Holder::fromRawData(const_cast<FileSystemNode *>(this)));
+
+        if (LIKELY(node.isValid()))
+            return Interface::Holder(new (std::nothrow) FileSystemNode(m_storage, node));
+    }
+
+    return node;
 }
 
 void FileSystemNode::setNode(const Interface::Holder &file, const Interface::Holder &node)

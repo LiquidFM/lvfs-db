@@ -77,6 +77,7 @@ protected: /* Core::Tools::TreeModel */
     virtual size_type indexOf(Item *item) const;
 
 private:
+    Interface::Holder filesystemNode();
     void doAdd(const Entity &entity);
     void doRemove(const Entity &entity);
     void doAdd(const QModelIndex &index, Item *item, const Entity &property, const EFC::String &propertyName);
