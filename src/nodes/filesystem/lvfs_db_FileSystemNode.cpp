@@ -99,13 +99,11 @@ Interface::Holder FileSystemNode::accept(const Interface::Holder &view, Files &f
                 if (::strcmp(filePath, storageEntry->location()) == 0)
                     prefix[0] = 0;
                 else
-                {
                     if (UNLIKELY(std::snprintf(prefix, sizeof(prefix), "%s/", filePath + ::strlen(storageEntry->location()) + 1) < 0))
                     {
                         m_storage->rollback();
                         return Interface::Holder();
                     }
-                }
 
                 for (auto &i : entity.properties())
                     if (m_storage->schema(path = i.second.entity) == IStorage::Path)

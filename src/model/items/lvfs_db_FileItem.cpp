@@ -21,6 +21,7 @@
 
 #include <lvfs/Module>
 #include <lvfs/IEntry>
+#include <lvfs/IDirectory>
 #include <lvfs/IApplication>
 #include <lvfs/IApplications>
 
@@ -39,6 +40,10 @@ FileItem::FileItem(const EntityValue &value, const Interface::Holder &file, Item
         m_name = toUnicode(m_file->as<IEntry>()->title());
         m_icon.addFile(toUnicode(m_file->as<IEntry>()->type()->icon()->as<IEntry>()->location()), QSize(16, 16));
         m_toolTip = toUnicode(m_file->as<IEntry>()->type()->name());
+
+        if (IDirectory *dir = m_file->as<IDirectory>())
+            for (IDirectory::const_iterator i = dir->begin(), end = dir->end(); i != end; ++i)
+                m_items.push_back(new FileItem(value, *i, this));
     }
     else
     {

@@ -86,6 +86,7 @@ void EntityValueDialog::init(const QRect &geometry)
 
     m_handler.registerMouseDoubleClickEventHandler(&EntityValueDialog::dblClick);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_F2,     &EntityValueDialog::edit);
+    m_handler.registerShortcut(Qt::NoModifier, Qt::Key_F3,     &EntityValueDialog::edit);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Insert, &EntityValueDialog::addValue);
     m_handler.registerShortcut(Qt::NoModifier, Qt::Key_Delete, &EntityValueDialog::removeValue);
     m_handler.registerShortcut(Qt::CTRL,       Qt::Key_F,      &EntityValueDialog::setFocusToFilter);

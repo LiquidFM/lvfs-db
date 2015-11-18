@@ -25,6 +25,7 @@
 #include "items/lvfs_db_PropertyItem.h"
 #include "../gui/value/lvfs_db_EntityValueDialog.h"
 
+#include <lvfs-core/IEditor>
 #include <lvfs-core/tools/widgets/ValueDialog>
 #include <QtGui/QMessageBox>
 
@@ -55,10 +56,17 @@ QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem
                     return new Editor<typename EntityValueType<Entity::Int>::type>::type(parent);
 
             case Entity::String:
-//                if (m_storage->schema(item->value().entity()) == Interface::Adaptor<IStorage>::Path)
-//                    return new Editor<typename EntityValueType<Entity::String>::type>::type(parent);
-//                else
+                if (m_storage->schema(item->value().entity()) != IStorage::Path)
                     return new Editor<typename EntityValueType<Entity::String>::type>::type(parent);
+                else
+                {
+                    if (Core::IEditor *editor = static_cast<FileItem *>(item)->file()->as<Core::IEditor>())
+                        editor->view(parent);
+                    else
+                        static_cast<FileItem *>(item)->open();
+
+                    break;
+                }
 
             case Entity::Date:
                 return new Editor<typename EntityValueType<Entity::Date>::type>::type(parent);
