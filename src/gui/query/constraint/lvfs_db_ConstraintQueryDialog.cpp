@@ -112,7 +112,7 @@ BaseConstraint::Holder ConstraintQueryDialog::takeConstraint(BaseConstraint *par
         return BaseConstraint::Holder(new ValueConstraint(
                 m_property,
                 static_cast<Constraint::Operator>(m_operator.itemData(m_operator.currentIndex(), Qt::UserRole).toInt()),
-                EntityValue::createValue(m_property.entity, EntityValue::InvalidId, fromUnicode(m_edit.text()).data()),
+                EntityValue::createSimpleValue(m_property.entity, EntityValue::InvalidId, fromUnicode(m_edit.text()).data()),
                 parent));
 }
 
