@@ -129,7 +129,7 @@ void RootNode::clear()
 
 Interface::Holder RootNode::node(const Interface::Holder &file) const
 {
-    Interface::Holder node(const_cast<RootNode *>(this)->filesystemNode());
+    const Interface::Holder &node = const_cast<RootNode *>(this)->filesystemNode();
 
     if (node.isValid())
         return node->as<Core::INode>()->node(file);
@@ -210,7 +210,7 @@ Interface::Holder RootNode::search(const Interface::Holder &view, const QModelIn
                     EntityValueReader reader(m_container->entityValues(dialog.entity(), dialog.constraint()->constraint()));
 
                     if (reader.isValid() && m_container->commit())
-                        return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::Holder::fromRawData(this)));
+                        return Interface::Holder(new (std::nothrow) QueryResultsNode(m_container, reader, Interface::self()));
                     else
                     {
                         QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_container->lastError()));
@@ -256,7 +256,7 @@ RootNode::size_type RootNode::indexOf(Item *item) const
     return InvalidIndex;
 }
 
-Interface::Holder RootNode::filesystemNode()
+const Interface::Holder &RootNode::filesystemNode()
 {
     RootNodeFilesItem *item = static_cast<RootNodeFilesItem *>(m_items[0]);
 
@@ -265,7 +265,7 @@ Interface::Holder RootNode::filesystemNode()
         Interface::Holder file(new (std::nothrow) FileSystemDirectory(m_container, m_container->file()));
 
         if (LIKELY(file.isValid()))
-            item->setNode(file->as<Core::INodeFactory>()->createNode(file, Interface::Holder::fromRawData(this)));
+            item->setNode(file->as<Core::INodeFactory>()->createNode(file, Interface::self()));
     }
 
     return item->node();

@@ -125,7 +125,7 @@ void RootView::goUpShortcut()
     const Interface::Holder &node = m_node->as<Core::INode>()->parent();
 
     if (node.isValid())
-        m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), node);
+        m_mainView->as<Core::IMainView>()->show(Interface::self(), node);
 }
 
 void RootView::goIntoShortcut()
@@ -134,10 +134,10 @@ void RootView::goIntoShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->activated(Interface::Holder::fromRawData(this), index);
+        Interface::Holder newNode = m_node->as<Db::INode>()->activated(Interface::self(), index);
 
         if (newNode.isValid())
-            m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
+            m_mainView->as<Core::IMainView>()->show(Interface::self(), newNode);
     }
 }
 
@@ -156,7 +156,7 @@ void RootView::removeShortcut()
     QModelIndex index = m_view.selectionModel()->currentIndex();
 
     if (index.isValid())
-        m_node->as<Db::INode>()->remove(Interface::Holder::fromRawData(this), index);
+        m_node->as<Db::INode>()->remove(Interface::self(), index);
 }
 
 void RootView::searchShortcut()
@@ -165,10 +165,10 @@ void RootView::searchShortcut()
 
     if (index.isValid())
     {
-        Interface::Holder newNode = m_node->as<Db::INode>()->search(Interface::Holder::fromRawData(this), index);
+        Interface::Holder newNode = m_node->as<Db::INode>()->search(Interface::self(), index);
 
         if (newNode.isValid())
-            m_mainView->as<Core::IMainView>()->show(Interface::Holder::fromRawData(this), newNode);
+            m_mainView->as<Core::IMainView>()->show(Interface::self(), newNode);
     }
 }
 
@@ -177,7 +177,7 @@ void RootView::insertShortcut()
     QModelIndex index = m_view.selectionModel()->currentIndex();
 
     if (index.isValid())
-        m_node->as<Db::INode>()->insert(Interface::Holder::fromRawData(this), index);
+        m_node->as<Db::INode>()->insert(Interface::self(), index);
 }
 
 }}

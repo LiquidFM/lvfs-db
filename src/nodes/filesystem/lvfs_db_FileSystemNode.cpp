@@ -195,10 +195,12 @@ Interface::Holder FileSystemNode::node(const Interface::Holder &file) const
 
     if (!node.isValid())
     {
-        node = file->as<Core::INodeFactory>()->createNode(file, Interface::Holder::fromRawData(const_cast<FileSystemNode *>(this)));
+        node = file->as<Core::INodeFactory>()->createNode(file, Interface::self());
 
         if (LIKELY(node.isValid()))
-            return Interface::Holder(new (std::nothrow) FileSystemNode(m_storage, node));
+            node = Interface::Holder(new (std::nothrow) FileSystemNode(m_storage, node));
+
+        m_node->setNode(file, node);
     }
 
     return node;
