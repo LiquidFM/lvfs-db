@@ -40,6 +40,7 @@ using namespace LiquidDb;
 
 
 QByteArray fromUnicode(const QString &string);
+QString toUnicode(const char *string);
 QString toUnicode(const ::EFC::String &string);
 QVariant toQVariant(const ::EFC::Variant &value);
 QRect toQRect(const IStorage::Rect &rect);

@@ -33,7 +33,7 @@ FilterValueModel::FilterValueModel(QObject *parent) :
 
 void FilterValueModel::setFilter(const QString &filter)
 {
-    m_filter = fromUnicode(filter);
+    m_filter = filter;
     invalidateFilter();
 }
 
@@ -45,7 +45,7 @@ bool FilterValueModel::filterAcceptsRow(int sourceRow, const QModelIndex &source
     {
         QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
         ASSERT(static_cast<Item *>(index.internalPointer())->isValue());
-        return ::strstr(static_cast<ValueItem *>(index.internalPointer())->value().value().asString(), m_filter.data()) != NULL;
+        return toUnicode(static_cast<ValueItem *>(index.internalPointer())->value().value().asString()).contains(m_filter, Qt::CaseInsensitive);
     }
 }
 

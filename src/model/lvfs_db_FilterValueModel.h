@@ -41,7 +41,7 @@ protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const;
 
 private:
-    QByteArray m_filter;
+    QString m_filter;
 };
 
 }}

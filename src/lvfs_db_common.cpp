@@ -30,6 +30,11 @@ QByteArray fromUnicode(const QString &string)
     return Core::Qt::Node::fromUnicode(string);
 }
 
+QString toUnicode(const char *string)
+{
+    return Core::Qt::Node::toUnicode(string);
+}
+
 QString toUnicode(const ::EFC::String &string)
 {
     return Core::Qt::Node::toUnicode(string.c_str());
