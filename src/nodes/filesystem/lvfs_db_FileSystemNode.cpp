@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  */
 
 #include "lvfs_db_FileSystemNode.h"
+#include "lvfs_db_FileSystemDirectory.h"
 #include "../../model/lvfs_db_ValueModel.h"
 #include "../../gui/choose/lvfs_db_ChooseEntityDialog.h"
 #include "../../gui/value/lvfs_db_EntityValueDialog.h"
@@ -195,12 +196,12 @@ Interface::Holder FileSystemNode::node(const Interface::Holder &file) const
 
     if (!node.isValid())
     {
-        node = file->as<Core::INodeFactory>()->createNode(file, Interface::self());
+        Interface::Holder file2(new (std::nothrow) FileSystemDirectory(m_storage, file));
 
-        if (LIKELY(node.isValid()))
-            node = Interface::Holder(new (std::nothrow) FileSystemNode(m_storage, node));
+        if (LIKELY(file2.isValid()))
+            node = file2->as<Core::INodeFactory>()->createNode(file2, Interface::self());
 
-        m_node->setNode(file, node);
+        m_node->setNode(file2, node);
     }
 
     return node;
