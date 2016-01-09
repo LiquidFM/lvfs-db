@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,14 +40,16 @@ RootView::RootView() :
     m_view.setSortingEnabled(true);
 
     m_eventHandler.registerMouseDoubleClickEventHandler(&RootView::goIntoShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Return,    &RootView::goIntoShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Enter,     &RootView::goIntoShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Backspace, &RootView::goUpShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F2,        &RootView::renameShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_F8,        &RootView::createFileShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Delete,    &RootView::removeShortcut);
-    m_eventHandler.registerShortcut(::Qt::CTRL,       ::Qt::Key_F,         &RootView::searchShortcut);
-    m_eventHandler.registerShortcut(::Qt::NoModifier, ::Qt::Key_Insert,    &RootView::insertShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_Return,    &RootView::goIntoShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_Enter,     &RootView::goIntoShortcut);
+    m_eventHandler.registerShortcut(::Qt::CTRL + ::Qt::SHIFT, ::Qt::Key_Left,      &RootView::newWindowOnOppositeTabShortcut);
+    m_eventHandler.registerShortcut(::Qt::CTRL + ::Qt::SHIFT, ::Qt::Key_Right,     &RootView::newWindowOnOppositeTabShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_Backspace, &RootView::goUpShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_F2,        &RootView::renameShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_F8,        &RootView::createFileShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_Delete,    &RootView::removeShortcut);
+    m_eventHandler.registerShortcut(::Qt::CTRL,               ::Qt::Key_F,         &RootView::searchShortcut);
+    m_eventHandler.registerShortcut(::Qt::NoModifier,         ::Qt::Key_Insert,    &RootView::insertShortcut);
 }
 
 RootView::~RootView()
@@ -139,6 +141,12 @@ void RootView::goIntoShortcut()
         if (newNode.isValid())
             m_mainView->as<Core::IMainView>()->show(Interface::self(), newNode);
     }
+}
+
+void RootView::newWindowOnOppositeTabShortcut()
+{
+//    Interface::Holder opposite = m_mainView->as<IMainView>()->opposite(Interface::self());
+//    m_node->as<Db::INode>()->activated(opposite, m_sortFilterModel.mapToSource(m_view.selectionModel()->currentIndex()), true);
 }
 
 void RootView::renameShortcut()

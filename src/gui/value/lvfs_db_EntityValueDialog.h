@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,6 +34,8 @@ public:
     EntityValueDialog(const Interface::Adaptor<IStorage> &storage, const EntityValue &value, const ValueModel::Files &files, QWidget *parent = 0);
 
 protected:
+    const Entity &entity() const { return m_mainWidget.entity(); }
+    const Interface::Adaptor<IStorage> &storage() const { return m_mainWidget.storage(); }
     QModelIndex currentIndex() const { return m_mainWidget.currentIndex(); }
 
 private:

@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "lvfs_db_SelectValueDialog.h"
 #include "../../model/items/lvfs_db_ValueItem.h"
+#include "../../lvfs_db_common.h"
 
 #include <brolly/assert.h>
 
@@ -28,7 +29,9 @@ SelectValueDialog::SelectValueDialog(const Interface::Adaptor<IStorage> &storage
 {}
 
 SelectValueDialog::~SelectValueDialog()
-{}
+{
+    storage()->setListGeometry(entity(), fromQRect(geometry()));
+}
 
 EntityValue SelectValueDialog::value()
 {

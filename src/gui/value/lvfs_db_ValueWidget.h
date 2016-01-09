@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,7 @@ public:
     TreeView &view() { return m_view; }
 
     const Entity &entity() const { return m_entity; }
+    const Interface::Adaptor<IStorage> &storage() const { return m_storage; }
     QModelIndex currentIndex() const { return m_proxy.mapToSource(m_view.selectionModel()->currentIndex()); }
 
     void edit();
@@ -154,6 +155,7 @@ public:
     virtual void critical(const QString &text);
 
     const Entity &entity() const { return m_private.entity(); }
+    const Interface::Adaptor<IStorage> &storage() const { return m_private.storage(); }
     QModelIndex currentIndex() const { return m_private.currentIndex(); }
 
     void edit() { m_private.edit(); }

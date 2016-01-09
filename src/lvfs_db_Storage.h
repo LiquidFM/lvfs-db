@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ public:
     Storage(const Interface::Holder &file, const Interface::Holder &storage);
     virtual ~Storage();
 
-    /* IStorage */
+public: /* IStorage */
     virtual bool isDbValid() const;
     virtual const char *lastError() const;
     virtual Interface::Holder file() const;
@@ -76,10 +76,10 @@ public:
     virtual bool removeValue(const Entity &entity, const Entity::IdsList &ids);
     virtual bool removeValue(const EntityValue &entityValue, const EntityValue &propertyValue);
 
-    /* Core::INodeFactory */
+public:  /* Core::INodeFactory */
     virtual Interface::Holder createNode(const Interface::Holder &file, const Interface::Holder &parent) const;
 
-    /* Core::IViewFactory */
+public: /* Core::IViewFactory */
     virtual Interface::Holder createView() const;
 
 private:
