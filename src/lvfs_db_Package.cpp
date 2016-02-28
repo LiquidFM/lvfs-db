@@ -37,7 +37,7 @@ const char *Package::name() const
     return "DB";
 }
 
-Settings::Scope *Package::settings() const
+Package::Settings *Package::settings() const
 {
     return NULL;
 }
