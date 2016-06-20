@@ -55,9 +55,9 @@ const Interface::Holder &FileSystemNode::file() const
     return m_node->file();
 }
 
-void FileSystemNode::refresh(int depth)
+void FileSystemNode::refresh()
 {
-    m_node->refresh(depth);
+    m_node->refresh();
 }
 
 void FileSystemNode::opened(const Interface::Holder &view)
@@ -111,28 +111,29 @@ Interface::Holder FileSystemNode::accept(const Interface::Holder &view, Files &f
                     {
                         EntityValue localValue;
 
-                        for (auto i = files.begin(), end = files.end(); i != end; ++i)
-                        {
-                            if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, (*i)->as<IEntry>()->title()) < 0))
+                        for (auto &i : files)
+                            for (auto &j : i.second)
                             {
-                                m_storage->rollback();
-                                return Interface::Holder();
-                            }
+                                if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, j->as<IEntry>()->title()) < 0))
+                                {
+                                    m_storage->rollback();
+                                    return Interface::Holder();
+                                }
 
-                            localValue = m_storage->addValue(path, buffer);
+                                localValue = m_storage->addValue(path, buffer);
 
-                            if (localValue.isValid())
-                            {
-                                list.push_back(localValue);
-                                dbFiles[localValue.id()] = (*i);
+                                if (localValue.isValid())
+                                {
+                                    list.push_back(localValue);
+                                    dbFiles[localValue.id()] = j;
+                                }
+                                else
+                                {
+                                    QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                                    m_storage->rollback();
+                                    return Interface::Holder();
+                                }
                             }
-                            else
-                            {
-                                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
-                                m_storage->rollback();
-                                return Interface::Holder();
-                            }
-                        }
 
                         break;
                     }

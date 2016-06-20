@@ -67,7 +67,7 @@ RootNode::~RootNode()
     ASSERT(m_items.empty());
 }
 
-void RootNode::refresh(int depth)
+void RootNode::refresh()
 {}
 
 void RootNode::opened(const Interface::Holder &view)

@@ -52,7 +52,7 @@ QueryResultsNode::QueryResultsNode(const Interface::Adaptor<IStorage> &storage, 
 QueryResultsNode::~QueryResultsNode()
 {}
 
-void QueryResultsNode::refresh(int depth)
+void QueryResultsNode::refresh()
 {
     if (m_reader.entity().type() == Entity::Composite)
     {
@@ -131,28 +131,29 @@ Interface::Holder QueryResultsNode::accept(const Interface::Holder &view, Core::
                     EntityValue::List list;
                     ValueModel::Files dbFiles;
 
-                    for (auto i = files.begin(), end = files.end(); i != end; ++i)
-                    {
-                        if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, (*i)->as<IEntry>()->title()) < 0))
+                    for (auto &i : files)
+                        for (auto &j : i.second)
                         {
-                            m_storage->rollback();
-                            return Interface::Holder();
-                        }
+                            if (UNLIKELY(std::snprintf(buffer, sizeof(buffer), "%s%s", prefix, j->as<IEntry>()->title()) < 0))
+                            {
+                                m_storage->rollback();
+                                return Interface::Holder();
+                            }
 
-                        localValue = m_storage->addValue(property->entity(), buffer);
+                            localValue = m_storage->addValue(property->entity(), buffer);
 
-                        if (localValue.isValid())
-                        {
-                            list.push_back(localValue);
-                            dbFiles[localValue.id()] = (*i);
+                            if (localValue.isValid())
+                            {
+                                list.push_back(localValue);
+                                dbFiles[localValue.id()] = j;
+                            }
+                            else
+                            {
+                                QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
+                                m_storage->rollback();
+                                return Interface::Holder();
+                            }
                         }
-                        else
-                        {
-                            QMessageBox::critical(view->as<Core::IView>()->widget(), tr("Error"), toUnicode(m_storage->lastError()));
-                            m_storage->rollback();
-                            return Interface::Holder();
-                        }
-                    }
 
                     if (m_storage->addValue(static_cast<ValueItem *>(item)->value(), list))
                     {

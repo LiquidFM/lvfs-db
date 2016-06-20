@@ -40,7 +40,7 @@ public: /* Core::INode */
     virtual const Interface::Holder &parent() const;
     virtual const Interface::Holder &file() const;
 
-    virtual void refresh(int depth = 0);
+    virtual void refresh();
     virtual void opened(const Interface::Holder &view);
     virtual void closed(const Interface::Holder &view);
     virtual Interface::Holder accept(const Interface::Holder &view, Files &files);
