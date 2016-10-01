@@ -4,16 +4,17 @@ project (lvfs-db)
 project_library_header_default ()
 
 # 3rdparty
-list (APPEND ${PROJECT_NAME}_LIBS brolly)
-list (APPEND ${PROJECT_NAME}_LIBS efc)
-list (APPEND ${PROJECT_NAME}_LIBS lvfs)
-list (APPEND ${PROJECT_NAME}_LIBS lvfs-core)
-list (APPEND ${PROJECT_NAME}_LIBS liquiddb)
+find_package (LiquidDb REQUIRED)
+include_directories (${LIQUIDDB_INCLUDE})
 
-find_package (Qt4 4.7.1 COMPONENTS QtCore QtGui REQUIRED)
-include (${QT_USE_FILE})
+find_package (Lvfs-Core REQUIRED)
+include_directories (${LVFS_CORE_INCLUDE})
+
+list (APPEND ${PROJECT_NAME}_LIBS ${EFC_LIB})
+list (APPEND ${PROJECT_NAME}_LIBS ${LVFS_LIB})
+list (APPEND ${PROJECT_NAME}_LIBS ${LIQUIDDB_LIB})
 list (APPEND ${PROJECT_NAME}_LIBS ${QT_LIBRARIES})
-add_definitions (${QT_DEFINITIONS} -DQT_NO_CAST_FROM_ASCII)
+list (APPEND ${PROJECT_NAME}_LIBS ${LVFS_CORE_LIB})
 
 # Sources
 add_subdirectory (src)
@@ -23,9 +24,6 @@ list (APPEND ${PROJECT_NAME}_SOURCES ${${PROJECT_NAME}_MOC_SOURCES})
 # Target - lvfs-db
 add_library (lvfs-db SHARED ${${PROJECT_NAME}_SOURCES})
 target_link_libraries (lvfs-db ${${PROJECT_NAME}_LIBS})
-
-# Version
-build_version_file (lvfs-db 0.0.1)
 
 # Documentation
 add_documentation ("LVFS-DB" 0.0.1 "LVFS Plugin for database of files")

@@ -1,7 +1,7 @@
 /**
  * This file is part of lvfs-db.
  *
- * Copyright (C) 2011-2015 Dmitriy Vilkov, <dav.daemon@gmail.com>
+ * Copyright (C) 2011-2016 Dmitriy Vilkov, <dav.daemon@gmail.com>
  *
  * lvfs-db is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "lvfs_db_Plugin.h"
 
 #include <lvfs/Module>
+#include <lvfs/plugins/Package>
 
 
 namespace LVFS {
@@ -37,7 +38,7 @@ const char *Package::name() const
     return "DB";
 }
 
-Package::Settings *Package::settings() const
+Settings::Scope *Package::settings() const
 {
     return NULL;
 }
@@ -67,4 +68,4 @@ const Package::Plugin **Package::protocolPlugins() const
 }}
 
 
-DECLARE_PLUGIN(::LVFS::Db::Package)
+DECLARE_PLUGINS_PACKAGE(::LVFS::Db::Package)
